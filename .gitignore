@@ -1,0 +1,41 @@
+# Environnements virtuels
+myenv/
+venv/
+.env/
+
+# Fichiers temporaires Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+
+# Fichiers de logs
+*.log
+
+# Fichiers de configuration locaux
+*.local
+*.env
+
+# Fichiers de sauvegarde d'éditeurs
+*~
+*.swp
+*.swo
+.DS_Store
+
+# Dossiers de données générées
+/data/
+
+# Fichiers de test ou de debug
+*.coverage
+.coverage
+htmlcov/
+
+# Fichiers de build
+build/
+dist/
+*.egg-info/
+
+# Notebooks temporaires
+*.ipynb_checkpoints/
+
