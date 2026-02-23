@@ -233,7 +233,9 @@ class CanvasView(QGraphicsView):
 
         # Ajouter l'image de fond
         if AppConfig.SHOW_PDF:
-            fond_path = "/home/jpvw/Documents/node_appli/gemma_suite/doc/GEMMA-fond.png"
+            import os
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            fond_path = os.path.abspath(os.path.join(base_dir, '../../../data/divers/GEMMA-fond.png'))
             pixmap = QPixmap(fond_path)
             # Redimensionner le pixmap à la taille du canvas
             canvas_w = AppConfig.CANVAS_WIDTH
@@ -289,7 +291,10 @@ class CanvasView(QGraphicsView):
         super().resizeEvent(event)
         # Adapter l'image de fond à la nouvelle taille du canvas
         if hasattr(self, 'fond_item') and self.fond_item is not None:
-            fond_path = "/home/jpvw/Documents/node_appli/gemma_suite/doc/GEMMA-fond.png"
+            import os
+            base_dir = os.path.dirname(os.path.abspath(__file__))
+            fond_path = os.path.abspath(os.path.join(base_dir, '../../../data/divers/GEMMA-fond.png'))
+            print(f"CanvasView: resizeEvent - redimensionnement du fond depuis {fond_path}")
             pixmap = QPixmap(fond_path)
             canvas_w = self.viewport().width()
             canvas_h = self.viewport().height()

@@ -138,32 +138,32 @@ class EtatsPalette(QWidget):
                     if type(item).__name__ == "EtatGraphicsObject":
                         scene.removeItem(item)
 
-                    # Ajouter les états chargés
-                    codes_ajoutes = set()
-                    for etat in STATE_BLOCKS:
-                        code = etat.get("code", "")
-                        label = etat.get("label", "")
-                        w = etat.get("w", 40)
-                        h = etat.get("h", 30)
-                        x = etat.get("x", 0)
-                        y = etat.get("y", 0)
-                        etat_item = EtatGraphicsObject(code, label, w, h)
-                        etat_item.setPos(x, y)
-                        scene.addItem(etat_item)
-                        codes_ajoutes.add(code)
-                    # Mettre à jour la liste des états restants
-                    self.etat_list.clear()
-                    for block in STATE_BLOCKS:
-                        code = block["code"]
-                        label = block["label"]
-                        if code not in codes_ajoutes:
-                            item = QListWidgetItem(f"Etat {code}")
-                            item.setData(Qt.ItemDataRole.UserRole, code)
-                            item.setToolTip(label)
-                            item.setFlags(item.flags() | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
-                            item.setBackground(QBrush(Qt.GlobalColor.black))
-                            item.setForeground(QBrush(Qt.GlobalColor.white))
-                            self.etat_list.addItem(item)
+                # Ajouter les états chargés
+                codes_ajoutes = set()
+                for etat in STATE_BLOCKS:
+                    code = etat.get("code", "")
+                    label = etat.get("label", "")
+                    w = etat.get("w", 40)
+                    h = etat.get("h", 30)
+                    x = etat.get("x", 0)
+                    y = etat.get("y", 0)
+                    etat_item = EtatGraphicsObject(code, label, w, h)
+                    etat_item.setPos(x, y)
+                    scene.addItem(etat_item)
+                    codes_ajoutes.add(code)
+                # Mettre à jour la liste des états restants
+                self.etat_list.clear()
+                for block in STATE_BLOCKS:
+                    code = block["code"]
+                    label = block["label"]
+                    if code not in codes_ajoutes:
+                        item = QListWidgetItem(f"Etat {code}")
+                        item.setData(Qt.ItemDataRole.UserRole, code)
+                        item.setToolTip(label)
+                        item.setFlags(item.flags() | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
+                        item.setBackground(QBrush(Qt.GlobalColor.black))
+                        item.setForeground(QBrush(Qt.GlobalColor.white))
+                        self.etat_list.addItem(item)
                 print(f"Chargement terminé depuis app_config")
 
     def handle_charger(self):

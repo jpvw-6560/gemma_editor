@@ -24,7 +24,7 @@ __pycache__/
 .DS_Store
 
 # Dossiers de données générées
-/data/
+
 
 # Fichiers de test ou de debug
 *.coverage
