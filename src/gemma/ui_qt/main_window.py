@@ -22,6 +22,9 @@ from gemma.ui_qt.right_menu import RightMenu
 from gemma.infrastructure.router import Router
 from gemma.infrastructure.routes import register_routes
 
+# Toast messages
+from gemma.application.services.toast import MsgToast
+
 # Palettes
 from gemma.ui_qt.palettes.layout_palette import LayoutPalette
 from gemma.ui_qt.palettes.etats_palette import EtatsPalette
@@ -148,61 +151,15 @@ class MainWindow(QMainWindow):
         wrapper = QWidget()
         wrapper.setLayout(main_layout)
         self.setCentralWidget(wrapper)
-        self.charger_derniere_application() 
+        # self.charger_derniere_application() 
 
-     
-    def show_toast(self, message, timeout=2000):
-        parent = self.centralWidget() or self
+    def showEvent(self, event):
+        super().showEvent(event)
 
-        toast = QLabel(message, parent)
-        toast.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        toast.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
-
-        toast.setStyleSheet("""
-            QLabel {
-                background-color: rgba(40, 40, 40, 230);
-                color: white;
-                padding: 10px 20px;
-                border-radius: 12px;
-                font-size: 13px;
-            }
-        """)
-
-        toast.adjustSize()
-
-        # Limite largeur
-        max_width = int(parent.width() * 0.6)
-        if toast.width() > max_width:
-            toast.setWordWrap(True)
-            toast.setFixedWidth(max_width)
-            toast.adjustSize()
-
-        # Position centre bas
-        x = (parent.width() - toast.width()) // 2
-        y = parent.height() - toast.height() - 60
-        toast.move(x, y)
-
-        # Effet opacité
-        effect = QGraphicsOpacityEffect(toast)
-        toast.setGraphicsEffect(effect)
-
-        toast.fade_in = QPropertyAnimation(effect, b"opacity")
-        toast.fade_in.setDuration(200)
-        toast.fade_in.setStartValue(0)
-        toast.fade_in.setEndValue(1)
-
-        toast.fade_out = QPropertyAnimation(effect, b"opacity")
-        toast.fade_out.setDuration(400)
-        toast.fade_out.setStartValue(1)
-        toast.fade_out.setEndValue(0)
-        toast.fade_out.finished.connect(toast.deleteLater)
-
-        toast.show()
-        toast.raise_()
-        toast.fade_in.start()
-
-        QTimer.singleShot(timeout, toast.fade_out.start)
-
+        # On ne veut l'appeler qu'une seule fois
+        if not hasattr(self, "_app_loaded"):
+            self._app_loaded = True
+            QTimer.singleShot(0, self.charger_derniere_application)
 
     def set_etats_editable(self, editable: bool):
             # Désactive ou active la modification des états sur le canvas
@@ -233,11 +190,11 @@ class MainWindow(QMainWindow):
                     last_app = settings.get('last_app', '').strip()
                     # print(f"MainWindow: last_app={last_app}")
             except (json.JSONDecodeError, OSError) as e:
-                QMessageBox.critical(self, "Erreur",
-                             f"Erreur lecture settings : {e}")
+                MsgToast.error("Erreur", f"Erreur lecture settings : {e}") 
+
                 return
         else:
-            print("settings.json introuvable")
+            MsgToast.warning("Fichier manquant", "settings.json introuvable")
             return
 
         if last_app:
@@ -269,11 +226,11 @@ class MainWindow(QMainWindow):
                     self.app_name = os.path.splitext(os.path.basename(file_path))[0]
                     # print("type:", type(self.app_courante))
                     self.app_courante.setText(f" [{self.app_name}]")
-                    self.show_toast(f"Application chargée : {file_path}")
+                    MsgToast.success("Application chargée", f"Application chargée : {file_path}")
                 except Exception as e:
-                    QMessageBox.critical(self, "Erreur", f"Erreur lors du chargement : {e}")
+                    MsgToast.error("Erreur", f"Erreur lors du chargement : {e}")
             else:
-                QMessageBox.warning(self, "Fichier manquant", f"Le fichier de la dernière application n'existe pas : {file_path}")
+                MsgToast.warning("Fichier manquant", f"Le fichier de la dernière application n'existe pas : {file_path}")
 
     def sauvegarder_application(self):
         applis_dir = os.path.abspath(
@@ -336,20 +293,18 @@ class MainWindow(QMainWindow):
             self.app_name = os.path.splitext(os.path.basename(file_path))[0]
             self.app_courante.setText(f" : [{self.app_name}]")
 
-            self.show_toast(f"Application sauvegardée sous : {file_path}")
+            MsgToast.success("Application sauvegardée", f"Application sauvegardée sous : {file_path}")
+            
 
         except (OSError, json.JSONDecodeError) as e:
-            QMessageBox.critical(
-                self,
-                "Erreur",
-                f"Erreur lors de la sauvegarde : {e}"
-            )
+            MsgToast.error("Erreur", f"Erreur lors de la sauvegarde : {e}")
     
     # Connexion du bouton Charger avec gestion du cas sans application
     def handle_charger_app(self):
+
         applis_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../data/applis_gemma'))
         if not os.path.exists(applis_dir) or not any(f.endswith('.json') for f in os.listdir(applis_dir)):
-            self.show_toast("Aucune application à charger.")
+            MsgToast.warning("Avertissement", "Aucune application à charger.")
             return
         dialog = QFileDialog(self)
         dialog.setWindowTitle("Charger une application")
@@ -390,8 +345,8 @@ class MainWindow(QMainWindow):
                 # Mettre à jour l'affichage
                 self.app_name = os.path.splitext(os.path.basename(file_path))[0]
                 self.app_courante.setText(f"[{self.app_name}]")
-                self.show_toast(f"Application chargée : {file_path}")
+                MsgToast.success("Application chargée", f"Application chargée : {file_path}")
             except Exception as e:
-                QMessageBox.critical(self, "Erreur", f"Erreur lors du chargement : {e}")
+                MsgToast.error("Erreur", f"Erreur lors du chargement : {e}")
 
    

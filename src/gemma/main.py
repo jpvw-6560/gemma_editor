@@ -4,6 +4,7 @@ from PyQt6.QtCore import QTranslator, QLocale, QLibraryInfo
 
 from gemma.infrastructure.container import Container
 from gemma.ui_qt.main_window import MainWindow
+from gemma.application.services.toast import MsgToast
 
 
 def main():
@@ -22,6 +23,9 @@ def main():
     container = Container()
     window = MainWindow(container)
     window.show()
+
+    # Afficher un message toast de bienvenue
+    MsgToast.info("Bienvenue", "Bienvenue dans GEMMA Editor !")
 
     sys.exit(app.exec())
 

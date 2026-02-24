@@ -26,6 +26,9 @@ class AppConfig:
     # Taille des poignées de redimensionnement    
     HANDLE_SIZE = 12
 
+    # Son pour les MsgToast
+    TOAST_SON = True
+
 # Calcul de la taille du canvas
     CANVAS_WIDTH = SCREEN_WIDTH - LEFT_MENU_WIDTH - RIGHT_MENU_WIDTH 
     CANVAS_HEIGHT = SCREEN_HEIGHT - TOP_BANDEAU_HEIGHT
