@@ -190,11 +190,13 @@ class MainWindow(QMainWindow):
                     last_app = settings.get('last_app', '').strip()
                     # print(f"MainWindow: last_app={last_app}")
             except (json.JSONDecodeError, OSError) as e:
-                MsgToast.error("Erreur", f"Erreur lecture settings : {e}") 
+                MsgToast.error("Erreur", f"Erreur lecture settings : {e}", parent=self) 
+                
 
                 return
         else:
-            MsgToast.warning("Fichier manquant", "settings.json introuvable")
+            MsgToast.warning("Fichier manquant", "settings.json introuvable", parent=self)
+            
             return
 
         if last_app:
@@ -226,12 +228,12 @@ class MainWindow(QMainWindow):
                     self.app_name = os.path.splitext(os.path.basename(file_path))[0]
                     # print("type:", type(self.app_courante))
                     self.app_courante.setText(f" [{self.app_name}]")
-                    MsgToast.success("Application chargée", f"Application chargée : {file_path}")
+                    MsgToast.success("Application chargée", f"Application chargée : {file_path}", parent=self)
                 except Exception as e:
-                    MsgToast.error("Erreur", f"Erreur lors du chargement : {e}")
+                    MsgToast.error("Erreur", f"Erreur lors du chargement : {e}", parent=self)
             else:
-                MsgToast.warning("Fichier manquant", f"Le fichier de la dernière application n'existe pas : {file_path}")
-
+                MsgToast.warning("Fichier manquant", f"Le fichier de la dernière application n'existe pas : {file_path}", parent=self)
+                
     def sauvegarder_application(self):
         applis_dir = os.path.abspath(
             os.path.join(os.path.dirname(__file__), '../../../data/applis_gemma')
@@ -293,18 +295,20 @@ class MainWindow(QMainWindow):
             self.app_name = os.path.splitext(os.path.basename(file_path))[0]
             self.app_courante.setText(f" : [{self.app_name}]")
 
-            MsgToast.success("Application sauvegardée", f"Application sauvegardée sous : {file_path}")
+            MsgToast.success("Application sauvegardée", f"Application sauvegardée sous : {file_path}", parent=self)
             
 
         except (OSError, json.JSONDecodeError) as e:
-            MsgToast.error("Erreur", f"Erreur lors de la sauvegarde : {e}")
+            MsgToast.error("Erreur", f"Erreur lors de la sauvegarde : {e}", parent=self)
+            
     
     # Connexion du bouton Charger avec gestion du cas sans application
     def handle_charger_app(self):
 
         applis_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../data/applis_gemma'))
         if not os.path.exists(applis_dir) or not any(f.endswith('.json') for f in os.listdir(applis_dir)):
-            MsgToast.warning("Avertissement", "Aucune application à charger.")
+            MsgToast.warning("Avertissement", "Aucune application à charger.", parent=self)
+              
             return
         dialog = QFileDialog(self)
         dialog.setWindowTitle("Charger une application")
@@ -345,8 +349,8 @@ class MainWindow(QMainWindow):
                 # Mettre à jour l'affichage
                 self.app_name = os.path.splitext(os.path.basename(file_path))[0]
                 self.app_courante.setText(f"[{self.app_name}]")
-                MsgToast.success("Application chargée", f"Application chargée : {file_path}")
+                MsgToast.success("Application chargée", f"Application chargée : {file_path}", parent=self)
+                
             except Exception as e:
-                MsgToast.error("Erreur", f"Erreur lors du chargement : {e}")
-
-   
+                MsgToast.error("Erreur", f"Erreur lors du chargement : {e}", parent=self)
+                

@@ -12,6 +12,9 @@ import os
 from gemma.config.app_config import STATE_BLOCKS, AppConfig
 from gemma.ui_qt.canvas.canvas_view import EtatGraphicsObject
 
+# Toast messages
+from gemma.application.services.toast import MsgToast
+
 class EtatListWidget(QListWidget):
     
     def mouseMoveEvent(self, event):
@@ -165,10 +168,12 @@ class EtatsPalette(QWidget):
                         item.setForeground(QBrush(Qt.GlobalColor.white))
                         self.etat_list.addItem(item)
                 print(f"Chargement terminé depuis app_config")
+                MsgToast.success("Chargement", f"Application chargée depuis app_config", parent=self.window())
 
     def handle_charger(self):
         if not self.canvas or not self.canvas.scene:
             print("Aucun canvas pour charger les états")
+            MsgToast.error("Erreur", "Aucun canvas pour charger les états", parent=self.window())
             return
 
         # Dossier par défaut
@@ -192,6 +197,7 @@ class EtatsPalette(QWidget):
                     etats = json.load(f)
             except Exception as e:
                 print(f"Erreur lors du chargement : {e}")
+                MsgToast.error("Erreur", f"Erreur lors du chargement : {e}", parent=self.window())
                 return
 
             scene = self.canvas.scene

@@ -9,7 +9,7 @@ from gemma.application.services.toast import MsgToast
 
 def main():
     app = QApplication(sys.argv)
-
+    
     # 🔹 Charger la traduction Qt en français
     translator = QTranslator()
     translator.load(
@@ -23,9 +23,6 @@ def main():
     container = Container()
     window = MainWindow(container)
     window.show()
-
-    # Afficher un message toast de bienvenue
-    MsgToast.info("Bienvenue", "Bienvenue dans GEMMA Editor !")
 
     sys.exit(app.exec())
 
