@@ -1,0 +1,83 @@
+.
+├── core
+│   ├── config
+│   │   ├── app_config.py
+│   │   └── __init__.py
+│   ├── controllers
+│   │   ├── editor_controller.py
+│   │   ├── etats_controller.py
+│   │   ├── __init__.py
+│   │   ├── layout_controller.py
+│   │   ├── mode_controller.py
+│   │   └── transitions_controller.py
+│   ├── data
+│   │   ├── applis_gemma
+│   │   │   ├── appli_gemma_bis.json
+│   │   │   └── appli_gemma.json
+│   │   ├── assets
+│   │   │   ├── css
+│   │   │   └── images
+│   │   │       └── GEMMA-fond.png
+│   │   ├── etats
+│   │   │   ├── etats_2.json
+│   │   │   ├── etats.json
+│   │   │   └── full_etats.json
+│   │   ├── settings.json
+│   │   └── transitions
+│   ├── __init__.py
+│   ├── model
+│   ├── router.py
+│   ├── routes.py
+│   ├── services
+│   │   └── toast
+│   │       ├── error.wav
+│   │       ├── info.wav
+│   │       ├── success.wav
+│   │       ├── toast.py
+│   │       └── warning.wav
+│   ├── utils
+│   │   ├── create_wav.py
+│   │   ├── pdf_to_png.py
+│   │   └── save_capture_to_png.py
+│   └── view
+│       ├── canvas_view.py
+│       ├── __init__.py
+│       ├── main_window.py
+│       ├── palettes
+│       │   ├── editor_palette.py
+│       │   ├── etats_palette.py
+│       │   ├── __init__.py
+│       │   ├── layout_palette.py
+│       │   └── transitions_palette.py
+│       └── right_menu.py
+├── pyproject.toml
+├── README.md
+├── requirements.txt
+├── src
+│   ├── gemma
+│   │   ├── application
+│   │   ├── domain
+│   │   │   ├── entities
+│   │   │   │   ├── project.py
+│   │   │   │   └── state.py
+│   │   │   ├── exceptions
+│   │   │   └── rules
+│   │   └── infrastructure
+│   │       ├── container.py
+│   │       └── __init__.py
+│   ├── __init__.py
+│   └── main.py
+├── structure.txt
+└── tests
+    ├── appli
+    │   ├── counter_controller.py
+    │   ├── couter_model.py
+    │   ├── __init__.py
+    │   └── main_window.py
+    ├── application
+    ├── domain
+    ├── __init__.py
+    ├── integration
+    └── main.py
+
+30 directories, 51 files
