@@ -1,24 +1,32 @@
 class ModeManager:
 
-    def __init__(self,  canvas):
+    def __init__(self, canvas, right_menu):
         self.canvas = canvas
+        self.right_menu = right_menu
         self.current_controller = None
 
-    def activate(self, mode_name):
+    def activate(self, mode_name: str):
 
-        if self.current_controller:
-            self.current_controller.disconnect()
+        # Nettoyage éventuel
+        #if self.current_controller:
+        #    self.current_controller.cleanup()
 
         if mode_name == "layout":
             from core.controller.layout_controller import LayoutController
-            self.current_controller = LayoutController( self.canvas)
-        """
+            from core.view.palettes.layout_palette import LayoutPalette
+
+            palette = LayoutPalette()
+            self.current_controller = LayoutController(self.canvas, palette)
+            self.canvas.controller = self.current_controller  # Assure le lien pour le resize
+            self.right_menu.set_palette_widget(palette)
+
         elif mode_name == "states":
             from core.controller.states_controller import StatesController
-            self.current_controller = StatesController(self.model, self.canvas)
+            from core.view.palettes.states_palette import StatesPalette
 
-        elif mode_name == "transitions":
-            from core.controller.transitions_controller import TransitionsController
-            self.current_controller = TransitionsController(self.model, self.canvas)
-        """
-        self.current_controller.connect()
+            palette = StatesPalette()
+            self.current_controller = StatesController(self.canvas, palette)
+            self.canvas.controller = self.current_controller  # Assure le lien pour le resize
+            self.right_menu.set_palette_widget(palette)
+            # Appel explicite de connect() pour afficher la liste
+            self.current_controller.connect()

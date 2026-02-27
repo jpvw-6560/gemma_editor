@@ -388,3 +388,5 @@ class CanvasView(QGraphicsView):
                 draw_content(bottom_y)
             else:
                 draw_content(top_y)
+
+                

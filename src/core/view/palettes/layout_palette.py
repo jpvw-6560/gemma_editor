@@ -1,134 +1,80 @@
-from PyQt6.QtWidgets import (
-    QWidget,
-    QVBoxLayout,
-    QLabel,
-    QListWidget,
-    QListWidgetItem,
-)
-from PyQt6.QtCore import Qt, QEvent
-from PyQt6.QtGui import QColor, QBrush
-from core.config.app_config import LAYOUT_BLOCKS
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QListWidget, QListWidgetItem
+from PyQt6.QtCore import Qt, QEvent, pyqtSignal
+from PyQt6.QtGui import QBrush
 
+from core.model.layout_model import LayoutModel
 
 class LayoutPalette(QWidget):
-    def __init__(self, canvas=None):
-        super().__init__()
+    # Signaux envoyés au controller
+    zoneHovered = pyqtSignal(str)  # lettre de la zone
+    zoneLeft = pyqtSignal()
 
-        self.canvas = canvas
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.layout_model = LayoutModel(self.width(), self.height())
+
         layout = QVBoxLayout()
+        self.setLayout(layout)
 
-        # =========================
-        # Titre
-        # =========================
         title = QLabel("Layout")
-        title.setStyleSheet(
-            "font-size: 18px; font-weight: bold; margin-top: 8px;"
-        )
+        title.setStyleSheet("font-size:18px;font-weight:bold;margin-top:8px;")
         layout.addWidget(title)
 
         subtitle = QLabel("Zones")
         subtitle.setStyleSheet(
-            "font-size: 14px; font-weight: bold; "
-            "margin-top: 10px; margin-bottom: 4px; margin-left: 4px;"
+            "font-size:14px;font-weight:bold;margin-top:10px;margin-bottom:4px;margin-left:4px;"
         )
         layout.addWidget(subtitle)
 
-        # =========================
-        # Liste des zones
-        # =========================
         self.zone_list = QListWidget()
-        self.zone_list.setMouseTracking(True)  # 🔥 indispensable
+        self.zone_list.setMouseTracking(True)
         self.zone_list.setSelectionMode(QListWidget.SelectionMode.NoSelection)
         self.zone_list.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
-        for letter, block in LAYOUT_BLOCKS.items():
+        for letter, block in self.layout_model.get_blocks().items():
             item = QListWidgetItem(f"Zone {letter}")
             item.setData(Qt.ItemDataRole.UserRole, letter)
             item.setToolTip(block.text)
-
-            # ⚡ Important : autoriser la couleur de fond
             item.setFlags(item.flags() | Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsEnabled)
-
-            # couleur de fond noire initiale
             item.setBackground(QBrush(Qt.GlobalColor.black))
-
+            item.setForeground(QBrush(Qt.GlobalColor.white))
             self.zone_list.addItem(item)
 
         layout.addWidget(self.zone_list)
         layout.addStretch()
-        self.setLayout(layout)
 
-        # =========================
+        # ==============================
         # Connexions hover
-        # =========================
-        self.zone_list.itemEntered.connect(self.on_item_hover)
+        # ==============================
+        self.zone_list.itemEntered.connect(self._on_item_hover)
         self.zone_list.viewport().installEventFilter(self)
 
-    # =====================================================
+    # ==============================
     # Hover sur un item
-    # =====================================================
-    def on_item_hover(self, item):
+    # ==============================
+    def _on_item_hover(self, item):
+        # 1️⃣ Mettre l’item de la liste en évidence
+        self.reset_list_visuals()  # remet les autres à l’état normal
+
+        item.setBackground(Qt.GlobalColor.lightGray)
+        item.setForeground(Qt.GlobalColor.black)
+
+        # 2️⃣ Émettre le signal vers le controller
         letter = item.data(Qt.ItemDataRole.UserRole)
+        self.zoneHovered.emit(letter)
 
-        if self.canvas:
-            self.canvas.highlight_zone(letter)
-
-        # Reset seulement la liste
-        self.reset_list_visuals()
-
-        item.setBackground(QBrush(Qt.GlobalColor.lightGray))
-        item.setForeground(QBrush(Qt.GlobalColor.black))
-
-    # =====================================================
-    # Sortie de la liste
-    # =====================================================
-    def on_leave(self, event):
-        # Canvas reset
-        if self.canvas:
-            self.canvas.highlight_zone(None)
-
-        # Liste reset
-        for i in range(self.zone_list.count()):
-            self.zone_list.item(i).setBackground(QBrush(Qt.GlobalColor.black))
-            self.zone_list.item(i).setForeground(QBrush(Qt.GlobalColor.white))
-
-        # Appeler le leaveEvent original
-        # self.zone_list.viewport().leaveEvent(event)
-
-    # =====================================================
-    # Event filter pour détecter la sortie du widget
-    # =====================================================
+    # ==============================
+    # Event filter pour sortie de la liste
+    # ==============================
     def eventFilter(self, obj, event):
-        if obj == self.zone_list.viewport():
-            if event.type() == QEvent.Type.Leave:
-                # Reset canvas
-                if self.canvas:
-                    self.canvas.highlight_zone(None)
-
-                # Reset liste
-                self.reset_list_visuals()
-
+        if obj == self.zone_list.viewport() and event.type() == QEvent.Type.Leave:
+            self.reset_list_visuals()  # reset visuel liste
+            self.zoneLeft.emit()       # signal au controller
         return super().eventFilter(obj, event)
-
-    # =====================================================
-    # Reset du hover
-    # =====================================================
-    def reset_hover(self):
-        # Canvas reset
-        if self.canvas:
-            self.canvas.highlight_zone(None)
-
-        # Liste reset
-        for i in range(self.zone_list.count()):
-            item = self.zone_list.item(i)
-            item.setBackground(QBrush(Qt.GlobalColor.black))
-            item.setForeground(QBrush(Qt.GlobalColor.white))
-
-    # =====================================================
-    # Reset list visuals
-    # =====================================================
+    
     def reset_list_visuals(self):
+        """Remet tous les items de la liste à leur couleur par défaut"""
         for i in range(self.zone_list.count()):
             item = self.zone_list.item(i)
-            item.setBackground(QBrush(Qt.GlobalColor.black))
-            item.setForeground(QBrush(Qt.GlobalColor.white))
+            item.setBackground(Qt.GlobalColor.black)  # fond noir
+            item.setForeground(Qt.GlobalColor.white)  # texte blanc
