@@ -21,6 +21,8 @@ class ModeManager:
             self.layout_controller = LayoutController(self.canvas, palette)
             self.right_menu.set_palette_widget(palette)
             self.current_controller = self.layout_controller
+            # Désactiver l'interactivité des états
+            self.canvas.set_states_interactive(False)
         elif mode_name == "states":
             from core.controller.states_controller import StatesController
             from core.view.palettes.states_palette import StatesPalette
@@ -29,6 +31,8 @@ class ModeManager:
             self.right_menu.set_palette_widget(palette)
             self.current_controller = self.states_controller
             self.current_controller.connect()
+            # Activer l'interactivité des états
+            self.canvas.set_states_interactive(True)
         # (Ré)instanciation du CanvasController à chaque changement de mode
         from core.controller.canvas_controller import CanvasController
         self.canvas_controller = CanvasController(

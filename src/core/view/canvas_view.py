@@ -35,13 +35,12 @@ class EtatGraphicsObject(QGraphicsObject):
         )
         self.handle_pos = QPointF(width - self.handle_size, height - self.handle_size)
         self._dragging_handle = False
+        self.handle_visible = True  # Par défaut, visible
 
     def boundingRect(self):
         return QRectF(0, 0, self.width, self.height)
 
     def paint(self, painter, option, widget=None):
-        
-
         # Rectangle principal
         painter.setBrush(QBrush(QColor(100, 200, 255)))
         painter.setPen(QPen(Qt.GlobalColor.black, 1))
@@ -71,15 +70,20 @@ class EtatGraphicsObject(QGraphicsObject):
             self.label
         )
 
-        # Handle
-        painter.setBrush(QBrush(Qt.GlobalColor.darkGray))
-        painter.setPen(QPen(Qt.GlobalColor.black, 1))
-        painter.drawRect(
-            int(self.handle_pos.x()),
-            int(self.handle_pos.y()),
-            self.handle_size,
-            self.handle_size
-        )
+        # Handle (affiché seulement si handle_visible)
+        if self.handle_visible:
+            painter.setBrush(QBrush(Qt.GlobalColor.darkGray))
+            painter.setPen(QPen(Qt.GlobalColor.black, 1))
+            painter.drawRect(
+                int(self.handle_pos.x()),
+                int(self.handle_pos.y()),
+                self.handle_size,
+                self.handle_size
+            )
+
+    def set_handle_visible(self, visible: bool):
+        self.handle_visible = visible
+        self.update()
         def mousePressEvent(self, event):
             if self._on_handle(event.pos()):
                 self._dragging_handle = True
@@ -339,6 +343,7 @@ class LayoutBlockGraphicsObject(QGraphicsObject):
 
   
 class CanvasView(QGraphicsView):
+        
     # Signal unique pour resize centralisé
     resizeSceneRequested = pyqtSignal(int, int)
     
@@ -365,6 +370,24 @@ class CanvasView(QGraphicsView):
         self.controller = None  # sera injecté depuis MainWindow
         self.current_highlight = None  # zone actuellement surlignée
         self.zones = {} # stockage des zones pour accès rapide
+
+    def set_states_interactive(self, enabled: bool):
+        """Active ou désactive le déplacement/redimensionnement des Etats et l'affichage du handle."""
+        self._states_interactive = enabled
+        for item in self.scene.items():
+            if isinstance(item, EtatGraphicsObject):
+                item.setFlag(QGraphicsObject.GraphicsItemFlag.ItemIsMovable, enabled)
+                item.setFlag(QGraphicsObject.GraphicsItemFlag.ItemIsSelectable, enabled)
+                item.set_handle_visible(enabled)
+
+    def apply_states_interactive(self):
+        """Réapplique l'état interactif courant à tous les Etats (utile après un redraw)."""
+        enabled = getattr(self, '_states_interactive', False)
+        for item in self.scene.items():
+            if isinstance(item, EtatGraphicsObject):
+                item.setFlag(QGraphicsObject.GraphicsItemFlag.ItemIsMovable, enabled)
+                item.setFlag(QGraphicsObject.GraphicsItemFlag.ItemIsSelectable, enabled)
+                item.set_handle_visible(enabled)
 
     def _init_scene(self):
         self.scene = QGraphicsScene(self)

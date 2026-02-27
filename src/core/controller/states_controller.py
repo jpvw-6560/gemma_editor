@@ -28,7 +28,6 @@ class StatesController(BaseModeController):
         # Adapter dynamiquement la taille/position des états selon w/h
         for etat in self.model.all():
             from core.view.canvas_view import EtatGraphicsObject
-            # Exemple de redimensionnement proportionnel (à adapter selon logique métier)
             scale_x = w / 1600 if w > 0 else 1
             scale_y = h / 900 if h > 0 else 1
             item = EtatGraphicsObject(
@@ -42,6 +41,8 @@ class StatesController(BaseModeController):
                 int(getattr(etat, "y", 0) * scale_y)
             )
             self.canvas.scene.addItem(item)
+        # Réappliquer l'état interactif courant
+        self.canvas.apply_states_interactive()
 
     # =========================
     # RESET
@@ -77,6 +78,7 @@ class StatesController(BaseModeController):
             )
             self.canvas.scene.addItem(item)
 
+        self.canvas.apply_states_interactive()
         self.palette.fill_etat_list(self.model.all())
         MsgToast.success("Reset", "Etats réinitialisés", parent=self.palette)
 
