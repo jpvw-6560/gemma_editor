@@ -31,6 +31,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.setWindowTitle("GEMMA Doctor")
         self.resize(1100, 650)
         self.app_name = "<Aucune application>"
 

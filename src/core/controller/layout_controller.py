@@ -11,8 +11,6 @@ class LayoutController(BaseModeController):
         self.model = LayoutModel(canvas.width(), canvas.height())
         self.palette = palette
 
-        # Connexion au signal resize du canvas
-        self.canvas.resizeLayoutRequested.connect(self.on_resize_layout)
 
         if self.palette:
             self._connect_palette_signals()

@@ -163,12 +163,11 @@ class EtatGroupWithResize(QGraphicsItemGroup):
         rect = self.rect.rect()
         self.handle.setRect(rect.width() - self.handle_size, rect.height() - self.handle_size, self.handle_size, self.handle_size)
 
-
 class AnimatedRectItem(QGraphicsObject):
     def __init__(self, x, y, w, h):
         super().__init__()
 
-        self.rect = QRectF(0, 0, w, h)
+        self.rect = QRectF(x, y, w, h)
         self.setPos(x, y)
 
         self._border_color = QColor(255, 255, 255)
@@ -217,11 +216,132 @@ class AnimatedRectItem(QGraphicsObject):
         self._border_color = QColor(0, 0, 0)
         self.update()
 
-   
+
+class LayoutBlockGraphicsObject(QGraphicsObject):
+
+    def __init__(self, key, block):
+        super().__init__()
+
+        self.key = key
+        self.block = block
+        self.circle_diameter = 20
+
+        # Position globale
+        self.setPos(block.x, block.y)
+
+        # Rectangle animé
+        self.rect_item = AnimatedRectItem(0, 0, block.w, block.h)
+        self.rect_item.setParentItem(self)
+
+        # Contenu
+        self.content_items = []
+        self._create_content()
+        self._update_geometry()
+
+    # -------------------------
+    # Obligatoire
+    # -------------------------
+    def boundingRect(self):
+        return QRectF(0, 0, self.block.w, self.block.h)
+
+    def paint(self, painter, option, widget=None):
+        pass  # tout est géré par les sous-items
+
+    # -------------------------
+    # Création contenu
+    # -------------------------
+    def _create_content(self):
+        self.content_items = []
+        padding = 8
+        # Pour chaque zone, on place le contenu en haut ou en bas
+        if self.key == "A":
+            positions = ["top"]
+        elif self.key == "D":
+            positions = ["bottom"]
+        elif self.key == "F":
+            positions = ["top", "bottom"]
+        else:
+            positions = ["top"]
+
+        for pos in positions:
+            circle = QGraphicsEllipseItem(self)
+            circle.setPen(QPen(Qt.GlobalColor.darkGray, 2))
+            circle.setBrush(QColor(180, 180, 180))
+
+            letter_item = QGraphicsTextItem(self.key, self)
+            font = letter_item.font()
+            font.setPointSize(10)
+            font.setBold(True)
+            letter_item.setFont(font)
+            letter_item.setDefaultTextColor(Qt.GlobalColor.darkGray)
+
+            text_item = QGraphicsTextItem(self.block.text, self)
+            font2 = text_item.font()
+            font2.setPointSize(10)
+            font2.setBold(True)
+            text_item.setFont(font2)
+            text_item.setDefaultTextColor(Qt.GlobalColor.darkGray)
+
+            self.content_items.append((circle, letter_item, text_item, pos))
+
+    # -------------------------
+    # Mise à jour géométrie
+    # -------------------------
+    def _update_geometry(self):
+        self.setPos(self.block.x, self.block.y)
+        self.rect_item.rect = QRectF(0, 0, self.block.w, self.block.h)
+        self.rect_item.update()
+        padding = 8
+        for circle, letter_item, text_item, pos in self.content_items:
+            circle_x = 10
+            if pos == "top":
+                circle_y = padding
+            else:  # "bottom"
+                circle_y = self.block.h - self.circle_diameter - padding
+
+            circle.setRect(
+                circle_x,
+                circle_y,
+                self.circle_diameter,
+                self.circle_diameter
+            )
+
+            # Centrage lettre
+            letter_width = letter_item.boundingRect().width()
+            letter_height = letter_item.boundingRect().height()
+            letter_item.setPos(
+                circle_x + (self.circle_diameter - letter_width) / 2,
+                circle_y + (self.circle_diameter - letter_height) / 2
+            )
+
+            # Le texte doit être aligné verticalement au centre du cercle
+            text_item.setPos(
+                circle_x + self.circle_diameter + 8,
+                circle_y + (self.circle_diameter - text_item.boundingRect().height()) / 2
+            )
+
+    # -------------------------
+    # Resize public
+    # -------------------------
+    def resize_block(self, block):
+        self.prepareGeometryChange()
+        self.block = block
+        self._update_geometry()
+
+    # -------------------------
+    # Expose animation
+    # -------------------------
+    def animate_highlight(self):
+        self.rect_item.animate_highlight()
+
+    def animate_unhighlight(self):
+        self.rect_item.animate_unhighlight()
+
+  
 class CanvasView(QGraphicsView):
-    # Signaux pour resize
-    resizeLayoutRequested = pyqtSignal(int, int)
-    resizeStatesRequested = pyqtSignal(int, int)
+    # Signal unique pour resize centralisé
+    resizeSceneRequested = pyqtSignal(int, int)
+    
 
     # =========================
     # 1️⃣ SIGNAUX PUBLICS
@@ -249,6 +369,13 @@ class CanvasView(QGraphicsView):
     def _init_scene(self):
         self.scene = QGraphicsScene(self)
         self.setScene(self.scene)
+        # Fixer la taille initiale de la scène à celle du viewport
+        self._sync_scene_size()
+
+    def _sync_scene_size(self):
+        w = self.viewport().width()
+        h = self.viewport().height()
+        self.scene.setSceneRect(0, 0, w, h)
 
     def _init_view_config(self):
         self.setAcceptDrops(True)
@@ -258,11 +385,11 @@ class CanvasView(QGraphicsView):
     # =====================================
     def resizeEvent(self, event):
         super().resizeEvent(event)
+        self._sync_scene_size()
         w = self.viewport().width()
         h = self.viewport().height()
-        self.resizeLayoutRequested.emit(w, h)
-        self.resizeStatesRequested.emit(w, h)
-
+        self.resizeSceneRequested.emit(w, h)
+        
     # =========================
     # 3️⃣ ÉVÉNEMENTS QT (ÉMISSION)
     # =========================
@@ -310,81 +437,33 @@ class CanvasView(QGraphicsView):
     # Construction des blocs
     # =====================================================
     def draw_layout_blocks(self, layout_data):
+
+        # ---- Première création ----
+        if not self._layout_items:
+            for key, block in layout_data.items():
+                item = LayoutBlockGraphicsObject(key, block)
+                self.scene.addItem(item)
+                self._layout_items[key] = item
+                self.zones[key] = item
+            return
         
-        # nettoyer ancien affichage
-        for item in self._layout_items.values():
-            self.scene.removeItem(item)
+        # ---- Supprimer blocs disparus ----
+        for key in list(self._layout_items.keys()):
+            if key not in layout_data:
+                self.scene.removeItem(self._layout_items[key])
+                del self._layout_items[key]
+                if key in self.zones:
+                    del self.zones[key]
 
-        self._layout_items.clear()
-        self.zones = {}  # reset zones pour éviter références obsolètes
-        # redessiner
+        # ---- Mise à jour blocs existants ----
         for key, block in layout_data.items():
-
-            rect = AnimatedRectItem(block.x, block.y, block.w, block.h)
-            self.scene.addItem(rect)
-            self._layout_items[key] = rect
-            self.zones[key] = rect
-            circle_diameter = 20
-
-            def draw_content(pos_y):
-                #-------------------------------- Circle --------------------------
-                circle_x = block.x + 10
-                circle_y = pos_y
-
-                circle = QGraphicsEllipseItem(
-                    circle_x,
-                    circle_y,
-                    circle_diameter,
-                    circle_diameter
-                )
-                circle.setPen(QPen(Qt.GlobalColor.darkGray, 2))
-                circle.setBrush(QColor(180, 180, 180))
-                self.scene.addItem(circle)
-                
-                #-------------------------------- Letter --------------------------
-                letter_item = QGraphicsTextItem(key)
-                font = letter_item.font()
-                font.setPointSize(10)
-                font.setBold(True)
-                letter_item.setFont(font)
-
-                letter_width = letter_item.boundingRect().width()
-                letter_height = letter_item.boundingRect().height()
-
-                letter_item.setPos(
-                    circle_x + (circle_diameter - letter_width) / 2,
-                    circle_y + (circle_diameter - letter_height) / 2
-                )
-                letter_item.setDefaultTextColor(Qt.GlobalColor.darkGray)
-                self.scene.addItem(letter_item)
-
-                #-------------------------------- Text --------------------------
-                text_item = QGraphicsTextItem(block.text)
-                font2 = text_item.font()
-                font2.setPointSize(10)
-                font2.setBold(True)
-                text_item.setFont(font2)
-
-                text_item.setPos(
-                    circle_x + circle_diameter + 2,
-                    circle_y -1
-                )
-                text_item.setDefaultTextColor(Qt.GlobalColor.darkGray)
-                self.scene.addItem(text_item)
-
-            top_y = block.y + 8
-            bottom_y = block.y + block.h - circle_diameter - 8
-
-            if key == "A":
-                draw_content(top_y)
-            elif key == "D":
-                draw_content(bottom_y)
-            elif key == "F":
-                draw_content(top_y)
-                draw_content(bottom_y)
+            if key in self._layout_items:
+                self._layout_items[key].resize_block(block)
             else:
-                draw_content(top_y)
-
+                item = LayoutBlockGraphicsObject(key, block)
+                self.scene.addItem(item)
+                self._layout_items[key] = item
+                self.zones[key] = item    
     # =====================================================
     # Construction des Etats
     # =====================================================
@@ -397,4 +476,4 @@ class CanvasView(QGraphicsView):
         for item in list(self.scene.items()):
             if isinstance(item, EtatGraphicsObject):
                 self.scene.removeItem(item)
-        
+            

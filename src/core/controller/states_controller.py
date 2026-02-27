@@ -14,8 +14,6 @@ class StatesController(BaseModeController):
         self.palette = palette
         self.model = StatesModel()
 
-        # Connexion au signal resize du canvas
-        self.canvas.resizeStatesRequested.connect(self.on_resize_states)
 
         # Connexions palette
         self.palette.resetRequested.connect(self.reset_states)
@@ -61,15 +59,22 @@ class StatesController(BaseModeController):
 
         self.canvas.remove_all_states()
 
-
+        # Utiliser la taille courante du canvas pour un positionnement proportionnel
+        w = self.canvas.viewport().width()
+        h = self.canvas.viewport().height()
+        scale_x = w / 1600 if w > 0 else 1
+        scale_y = h / 900 if h > 0 else 1
         for etat in self.model.all():
             item = EtatGraphicsObject(
                 etat.code,
                 etat.label,
-                getattr(etat, "w", 40),
-                getattr(etat, "h", 30)
+                int(getattr(etat, "w", 40) * scale_x),
+                int(getattr(etat, "h", 30) * scale_y)
             )
-            item.setPos(getattr(etat, "x", 0), getattr(etat, "y", 0))
+            item.setPos(
+                int(getattr(etat, "x", 0) * scale_x),
+                int(getattr(etat, "y", 0) * scale_y)
+            )
             self.canvas.scene.addItem(item)
 
         self.palette.fill_etat_list(self.model.all())
