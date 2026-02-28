@@ -20,6 +20,9 @@ import os
 # Bloc état redimensionnable sans cadre blanc
 # ===============================
 class EtatGraphicsObject(QGraphicsObject):
+    # Signal pour demander la suppression du bloc
+    deleteRequested = pyqtSignal(str)
+
     
     def __init__(self, code, label, width=250, height=150):
         super().__init__()
@@ -36,6 +39,8 @@ class EtatGraphicsObject(QGraphicsObject):
         self.handle_pos = QPointF(width - self.handle_size, height - self.handle_size)
         self._dragging_handle = False
         self.handle_visible = True  # Par défaut, visible
+        self._border_color = Qt.GlobalColor.black  # Bordure noire par défaut
+        self._states_interactive = True  # Par défaut, le clic droit est actif
 
     def boundingRect(self):
         return QRectF(0, 0, self.width, self.height)
@@ -43,7 +48,7 @@ class EtatGraphicsObject(QGraphicsObject):
     def paint(self, painter, option, widget=None):
         # Rectangle principal
         painter.setBrush(QBrush(QColor(100, 200, 255)))
-        painter.setPen(QPen(Qt.GlobalColor.black, 1))
+        painter.setPen(QPen(self._border_color, 2))
         painter.drawRect(0, 0, int(self.width), int(self.height))
 
         # Cercle
@@ -84,11 +89,49 @@ class EtatGraphicsObject(QGraphicsObject):
     def set_handle_visible(self, visible: bool):
         self.handle_visible = visible
         self.update()
-        def mousePressEvent(self, event):
+            
+    def mousePressEvent(self, event):
+        # Accès à la vue principale (CanvasView) via la scène
+        canvas_view = None
+        if self.scene() and self.scene().views():
+            canvas_view = self.scene().views()[0]
+        if canvas_view:
+            print(f"Mouse press on state : {canvas_view.action_for_states}")
+            action_for_states = canvas_view.action_for_states
+        else:
+            print("Mouse press on state : (vue non trouvée)")
+            action_for_states = None
+        if event.button() == Qt.MouseButton.RightButton:
+            if not action_for_states:
+                print("Clic droit désactivé sur les blocs état")
+                # Si le clic droit est désactivé, on laisse le comportement par défaut
+                super().mousePressEvent(event)
+                return
+            # Mettre en évidence la bordure spécifique état
+            self.animate_state_block_highlight()
+            # Menu contextuel
+            from PyQt6.QtWidgets import QMenu
+            menu = QMenu()
+            action_delete = menu.addAction('Supprimer')
+            action = menu.exec(event.screenPos())
+            if action == action_delete:
+                # Émettre le signal pour suppression
+                self.deleteRequested.emit(self.code)
+            # Désélectionner la bordure après
+            self.animate_state_block_unhighlight()
+        else:
             if self._on_handle(event.pos()):
                 self._dragging_handle = True
             else:
                 super().mousePressEvent(event)
+        
+    def animate_state_block_highlight(self):
+        self._border_color = Qt.GlobalColor.red
+        self.update()
+
+    def animate_state_block_unhighlight(self):
+        self._border_color = Qt.GlobalColor.black
+        self.update()
 
     def mouseMoveEvent(self, event):
         if self._dragging_handle:
@@ -365,6 +408,7 @@ class CanvasView(QGraphicsView):
         super().__init__()
         self._init_scene()
         self._init_view_config()
+        self.action_for_states = None  # pour stocker l'action du clic droit sur les états
         # stockage graphique uniquement
         self._layout_items = {}
         self.controller = None  # sera injecté depuis MainWindow
@@ -379,6 +423,8 @@ class CanvasView(QGraphicsView):
                 item.setFlag(QGraphicsObject.GraphicsItemFlag.ItemIsMovable, enabled)
                 item.setFlag(QGraphicsObject.GraphicsItemFlag.ItemIsSelectable, enabled)
                 item.set_handle_visible(enabled)
+        print(f"States interactive set to: {enabled}")
+
 
     def apply_states_interactive(self):
         """Réapplique l'état interactif courant à tous les Etats (utile après un redraw)."""
@@ -490,12 +536,12 @@ class CanvasView(QGraphicsView):
     # =====================================================
     # Construction des Etats
     # =====================================================
-    def draw_states(self, states):
+    def draw_state_blocks(self, states):
         for state in states:
             graphics_item = StateGraphicsItem(state)
             self.scene.addItem(graphics_item)
 
-    def remove_all_states(self):
+    def remove_all_state_blocks(self):
         for item in list(self.scene.items()):
             if isinstance(item, EtatGraphicsObject):
                 self.scene.removeItem(item)
