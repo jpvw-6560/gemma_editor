@@ -1,4 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout
+from core.config.app_config import AppConfig
 
 class RightMenu(QWidget):
     def __init__(self):
@@ -9,6 +10,7 @@ class RightMenu(QWidget):
         self.layout.setContentsMargins(2, 2, 2, 2)
         self.layout.setSpacing(5)
         self.setLayout(self.layout)
+        self.setFixedWidth(AppConfig.RIGHT_MENU_WIDTH)
 
         self.current_widget = None  # widget actuellement affiché
 

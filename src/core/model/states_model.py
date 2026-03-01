@@ -3,7 +3,7 @@ from core.model.state_block import StateBlock
 
 
 # =========================
-# Données internes (pas d'import)
+# Données internes (pas d'import) Coordonnées valables pour fullSize Window 1920x1080
 # =========================
 STATE_BLOCKS = [
     {"code": "D3", "label": "Production tout de même", "x": 390, "y": 546, "w": 290, "h": 149},

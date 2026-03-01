@@ -14,7 +14,7 @@ from PyQt6.QtGui import (
     QPainter,
     QPixmap,
     QPen,
-    QCursor
+    QCursor, QFont
 )
 
 from PyQt6.QtWidgets import (
@@ -35,7 +35,7 @@ from PyQt6.QtWidgets import (
 class StatesListWidget(QListWidget):
 
     # 🔥 Signal MVC : code, label, position globale
-    stateDropped = pyqtSignal(str, str, QPoint)
+    stateDropped = pyqtSignal(str, str, QPointF)
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -57,9 +57,9 @@ class StatesListWidget(QListWidget):
             if item:
                 self.start_pos = event.pos()
                 self.drag_item = item
-
-                # 🔥 offset précis curseur → coin sprite
-                self.drag_offset = QPoint(100, 50)  # moitié de 200x100
+                # Correction : offset dynamique curseur → coin supérieur gauche de l'item
+                item_rect = self.visualItemRect(item)
+                self.drag_offset = event.pos() - item_rect.topLeft()
         super().mousePressEvent(event)
 
     # ------------------------------------------------------
@@ -73,12 +73,12 @@ class StatesListWidget(QListWidget):
         # seuil anti micro-mouvements
         if (event.pos() - self.start_pos).manhattanLength() < 8:
             return super().mouseMoveEvent(event)
-
+        #print(f"MouseMove: pos={event.pos()}, start={self.start_pos}, offset={self.drag_offset}")
         if not self.drag_label:
             self._create_drag_sprite()
 
         global_pos = self.mapToGlobal(event.pos())
-        self.drag_label.move(global_pos - self.drag_offset)
+        self.drag_label.move(global_pos) # Pas de self.drag_offset)
 
     # ------------------------------------------------------
     # Mouse Release
@@ -93,8 +93,6 @@ class StatesListWidget(QListWidget):
             self.window().mapFromGlobal(global_pos)
         )
 
-        print(f"Drop widget: {widget} type={type(widget)}")
-
         # Recherche directe du CanvasView dans la fenêtre
         from core.view.canvas_view import CanvasView
         canvas = self.window().findChild(CanvasView)
@@ -103,12 +101,13 @@ class StatesListWidget(QListWidget):
             canvas_rect = canvas.rect()
             canvas_pos = canvas.mapToGlobal(canvas_rect.topLeft())
             canvas_rect_global = canvas_rect.translated(canvas_pos)
-            print(f"Canvas global rect: {canvas_rect_global}, Cursor: {global_pos}")
-            if canvas_rect_global.contains(global_pos):
-                print("Drop accepté sur canvas !")
+            if canvas_rect_global.contains(global_pos + QPoint(50, 0)):
                 code = self.drag_item.data(Qt.ItemDataRole.UserRole)
                 label = self.drag_item.toolTip()
-                self.stateDropped.emit(code, label, global_pos)
+                # Conversion de la position globale en position scène
+                scene_pos = canvas.mapToScene(canvas.mapFromGlobal(global_pos))
+                # print(f"MouseRelease: code={code}, label={label}, scene_pos=({scene_pos.x()}, {scene_pos.y()})")
+                self.stateDropped.emit(code, label, scene_pos)
                 self._cleanup_drag()
                 return
         self._animate_return()
@@ -119,27 +118,31 @@ class StatesListWidget(QListWidget):
     # Sprite creation
     # ------------------------------------------------------
     def _create_drag_sprite(self):
-
-        pixmap = QPixmap(200, 100)
+        
+        width, height, roundness = 50, 30, 2
+        pixmap = QPixmap(width, height)
         pixmap.fill(Qt.GlobalColor.transparent)
 
         painter = QPainter(pixmap)
+        #painter.begin(pixmap)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
         painter.setBrush(QBrush(QColor(255, 255, 180)))
         painter.setPen(QPen(Qt.GlobalColor.black, 2))
-        painter.drawRoundedRect(0, 0, 199, 99, 12, 12)
+        painter.drawRoundedRect(0, 0, width, height, roundness, roundness)
 
-        code = self.drag_item.data(Qt.ItemDataRole.UserRole)
+        code = str(self.drag_item.data(Qt.ItemDataRole.UserRole))
         label = self.drag_item.toolTip()
 
         painter.setPen(Qt.GlobalColor.black)
-        painter.drawText(20, 40, code)
-        painter.drawText(20, 75, label)
+        painter.setFont(QFont("Arial", 12, QFont.Weight.Normal ))
+        painter.drawText( 12 , height // 2 + 6, code)
+        #painter.drawText(20, 75, label)
         painter.end()
 
         self.drag_label = QLabel(self.window())
         self.drag_label.setPixmap(pixmap)
+        self.drag_label.setFixedSize(width, height)
         self.drag_label.setAttribute(
             Qt.WidgetAttribute.WA_TransparentForMouseEvents
         )
@@ -154,7 +157,7 @@ class StatesListWidget(QListWidget):
         self.drag_label.setGraphicsEffect(shadow)
 
         self.drag_label.show()
-
+        
     # ------------------------------------------------------
     # Animation retour si drop invalide
     # ------------------------------------------------------

@@ -31,6 +31,8 @@ class AppController:
     # -----------------------------
     def activate_layout_mode(self):
         self.mode_manager.activate("layout")
+        self.view.set_mode_button_style("layout")
 
     def activate_states_mode(self):
         self.mode_manager.activate("states")
+        self.view.set_mode_button_style("states")

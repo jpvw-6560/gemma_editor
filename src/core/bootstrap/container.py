@@ -10,6 +10,8 @@ class Container:
     def __init__(self):
         # self.model = AppModel()
         self.main_window = MainWindow()
+        
         self.app_controller = AppController(
             view=self.main_window
         )
+        # self.main_window.showMaximized()

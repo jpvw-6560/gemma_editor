@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import (
     QGraphicsItem
 )
 
-from PyQt6.QtGui import QColor, QPen, QBrush, QPixmap, QFontMetrics
+from PyQt6.QtGui import QColor, QPen, QBrush, QPixmap, QFontMetrics, QPainter, QCursor
 from PyQt6.QtCore import Qt, QEvent, QPropertyAnimation, pyqtProperty, QRectF, QPointF, QEasingCurve, pyqtSignal
 from core.config.app_config import AppConfig
 
@@ -28,6 +28,8 @@ class EtatGraphicsObject(QGraphicsObject):
         super().__init__()
         self.code = code
         self.label = label
+        self.width_ref = width
+        self.height_ref = height
         self.width = width
         self.height = height
         self.handle_size = AppConfig.HANDLE_SIZE
@@ -146,6 +148,7 @@ class EtatGraphicsObject(QGraphicsObject):
             super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
+        print(f"Mouse release on state : dragging_handle={self._dragging_handle}")
         self._dragging_handle = False
         super().mouseReleaseEvent(event)
 
@@ -386,6 +389,19 @@ class LayoutBlockGraphicsObject(QGraphicsObject):
 
   
 class CanvasView(QGraphicsView):
+
+    def __init__(self):
+        super().__init__()
+        self.setContentsMargins(0, 0, 0, 0)
+        self._init_scene()
+        self._init_view_config()
+        self.action_for_states = None
+        self._layout_items = {}
+        self.controller = None
+        self.current_highlight = None
+        self.zones = {}
+       
+            
         
     # Signal unique pour resize centralisé
     resizeSceneRequested = pyqtSignal(int, int)
@@ -400,20 +416,13 @@ class CanvasView(QGraphicsView):
     itemClicked = pyqtSignal(object)
     mouseMoved = pyqtSignal(QPointF)
 
+
+    def accept_drop_from_palette(self):
+        return True
     # =========================
     # 2️⃣ INITIALISATION
     # =========================
 
-    def __init__(self):
-        super().__init__()
-        self._init_scene()
-        self._init_view_config()
-        self.action_for_states = None  # pour stocker l'action du clic droit sur les états
-        # stockage graphique uniquement
-        self._layout_items = {}
-        self.controller = None  # sera injecté depuis MainWindow
-        self.current_highlight = None  # zone actuellement surlignée
-        self.zones = {} # stockage des zones pour accès rapide
 
     def set_states_interactive(self, enabled: bool):
         """Active ou désactive le déplacement/redimensionnement des Etats et l'affichage du handle."""
@@ -423,7 +432,7 @@ class CanvasView(QGraphicsView):
                 item.setFlag(QGraphicsObject.GraphicsItemFlag.ItemIsMovable, enabled)
                 item.setFlag(QGraphicsObject.GraphicsItemFlag.ItemIsSelectable, enabled)
                 item.set_handle_visible(enabled)
-        print(f"States interactive set to: {enabled}")
+        
 
 
     def apply_states_interactive(self):
@@ -436,6 +445,7 @@ class CanvasView(QGraphicsView):
                 item.set_handle_visible(enabled)
 
     def _init_scene(self):
+        
         self.scene = QGraphicsScene(self)
         self.setScene(self.scene)
         # Fixer la taille initiale de la scène à celle du viewport
@@ -447,8 +457,13 @@ class CanvasView(QGraphicsView):
         self.scene.setSceneRect(0, 0, w, h)
 
     def _init_view_config(self):
-        self.setAcceptDrops(True)
+        pass
 
+    def handle_state_drop(self, code, label, global_pos):
+        scene_pos = self.mapToScene(self.mapFromGlobal(global_pos))
+        print(f"Handling state drop in CanvasView: code={code}, label={label}, global_pos={global_pos}, scene_pos={scene_pos}")
+        # Bloc ajouté uniquement par StatesController.on_state_dropped (taille adaptée)
+        
     # =====================================
     # Resize automatique
     # =====================================
@@ -458,16 +473,10 @@ class CanvasView(QGraphicsView):
         w = self.viewport().width()
         h = self.viewport().height()
         self.resizeSceneRequested.emit(w, h)
-        
+            
     # =========================
     # 3️⃣ ÉVÉNEMENTS QT (ÉMISSION)
     # =========================
-
-    def dropEvent(self, event):
-        code = ...
-        label = ...
-        pos = self.mapToScene(event.pos())
-        self.stateDropped.emit(code, label, pos)
 
     def mousePressEvent(self, event):
         pos = self.mapToScene(event.pos())
@@ -533,6 +542,7 @@ class CanvasView(QGraphicsView):
                 self.scene.addItem(item)
                 self._layout_items[key] = item
                 self.zones[key] = item    
+                
     # =====================================================
     # Construction des Etats
     # =====================================================
@@ -545,4 +555,3 @@ class CanvasView(QGraphicsView):
         for item in list(self.scene.items()):
             if isinstance(item, EtatGraphicsObject):
                 self.scene.removeItem(item)
-            

@@ -23,16 +23,28 @@ class ModeManager:
             self.current_controller = self.layout_controller
             # Désactiver l'interactivité des états
             self.canvas.set_states_interactive(False)
+            self.canvas.action_for_states = False
         elif mode_name == "states":
             from core.controller.states_controller import StatesController
             from core.view.palettes.states_palette import StatesPalette
             palette = StatesPalette()
+            
+            # Relais du signal drop palette → canvas
+            from PyQt6.QtCore import QPointF
+            def relay_state_dropped(code, label, pos):
+                # Conversion QPoint (palette) → QPointF (canvas)
+                if isinstance(pos, QPointF):
+                    self.canvas.stateDropped.emit(code, label, pos)
+                else:
+                    self.canvas.stateDropped.emit(code, label, QPointF(pos))
+            palette.stateDropped.connect(relay_state_dropped)
             self.states_controller = StatesController(self.canvas, palette)
             self.right_menu.set_palette_widget(palette)
             self.current_controller = self.states_controller
             self.current_controller.connect()
             # Activer l'interactivité des états
             self.canvas.set_states_interactive(True)
+            self.canvas.action_for_states = True
         # (Ré)instanciation du CanvasController à chaque changement de mode
         from core.controller.canvas_controller import CanvasController
         self.canvas_controller = CanvasController(
