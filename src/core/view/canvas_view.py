@@ -121,6 +121,8 @@ class EtatGraphicsObject(QGraphicsObject):
                 self.deleteRequested.emit(self.code)
             # Désélectionner la bordure après
             self.animate_state_block_unhighlight()
+            QGraphicsView.TransformationAnchor,
+            QGraphicsView.ResizeAnchor
         else:
             if self._on_handle(event.pos()):
                 self._dragging_handle = True
@@ -232,6 +234,14 @@ class AnimatedRectItem(QGraphicsObject):
     # =========================
     def boundingRect(self):
         return self.rect
+    # =========================
+    # Ajout de setRect pour mise à jour
+    # =========================
+    def setRect(self, x, y, w, h):
+        # ⚠️ Prévenir Qt que la géométrie change
+        self.prepareGeometryChange()
+        self.rect = QRectF(x, y, w, h)
+        self.update()
 
     def paint(self, painter, option, widget):
         painter.setBrush(QBrush(self._background))
@@ -276,18 +286,18 @@ class LayoutBlockGraphicsObject(QGraphicsObject):
         self.block = block
         self.circle_diameter = 20
 
-        # Position globale
+        # IMPORTANT : définir width/height AVANT toute chose
+        self.width = block.w
+        self.height = block.h
+
         self.setPos(block.x, block.y)
 
-        # Rectangle animé
         self.rect_item = AnimatedRectItem(0, 0, block.w, block.h)
         self.rect_item.setParentItem(self)
 
-        # Contenu
         self.content_items = []
         self._create_content()
         self._update_geometry()
-
     # -------------------------
     # Obligatoire
     # -------------------------
@@ -338,15 +348,27 @@ class LayoutBlockGraphicsObject(QGraphicsObject):
     # Mise à jour géométrie
     # -------------------------
     def _update_geometry(self):
+        # ⚠️ prévenir Qt AVANT tout changement de taille
+        self.prepareGeometryChange()
+
+        # Mettre à jour les dimensions utilisées par boundingRect
+        self.width = self.block.w
+        self.height = self.block.h
+
+        # Position globale
         self.setPos(self.block.x, self.block.y)
-        self.rect_item.rect = QRectF(0, 0, self.block.w, self.block.h)
-        self.rect_item.update()
+
+        # Rectangle visuel (⚠️ voir remarque plus bas)
+        self.rect_item.setRect(0, 0, self.block.w, self.block.h)
+
         padding = 8
+
         for circle, letter_item, text_item, pos in self.content_items:
             circle_x = 10
+
             if pos == "top":
                 circle_y = padding
-            else:  # "bottom"
+            else:
                 circle_y = self.block.h - self.circle_diameter - padding
 
             circle.setRect(
@@ -356,20 +378,17 @@ class LayoutBlockGraphicsObject(QGraphicsObject):
                 self.circle_diameter
             )
 
-            # Centrage lettre
-            letter_width = letter_item.boundingRect().width()
-            letter_height = letter_item.boundingRect().height()
+            letter_rect = letter_item.boundingRect()
             letter_item.setPos(
-                circle_x + (self.circle_diameter - letter_width) / 2,
-                circle_y + (self.circle_diameter - letter_height) / 2
+                circle_x + (self.circle_diameter - letter_rect.width()) / 2,
+                circle_y + (self.circle_diameter - letter_rect.height()) / 2
             )
 
-            # Le texte doit être aligné verticalement au centre du cercle
+            text_rect = text_item.boundingRect()
             text_item.setPos(
                 circle_x + self.circle_diameter + 8,
-                circle_y + (self.circle_diameter - text_item.boundingRect().height()) / 2
+                circle_y + (self.circle_diameter - text_rect.height()) / 2
             )
-
     # -------------------------
     # Resize public
     # -------------------------
@@ -387,25 +406,44 @@ class LayoutBlockGraphicsObject(QGraphicsObject):
     def animate_unhighlight(self):
         self.rect_item.animate_unhighlight()
 
-  
+
+
 class CanvasView(QGraphicsView):
 
-    def __init__(self):
-        super().__init__()
-        self.setContentsMargins(0, 0, 0, 0)
-        self._init_scene()
-        self._init_view_config()
-        self.action_for_states = None
-        self._layout_items = {}
-        self.controller = None
-        self.current_highlight = None
-        self.zones = {}
-       
-            
-        
     # Signal unique pour resize centralisé
     resizeSceneRequested = pyqtSignal(int, int)
     
+    def __init__(self):
+        super().__init__()
+        self.setContentsMargins(0, 0, 0, 0)
+
+        # Initialisation de la scene
+        self.scene = QGraphicsScene(0, 0, AppConfig.REFERENCE_CANVAS_WIDTH, AppConfig.REFERENCE_CANVAS_HEIGHT)
+        self.setScene(self.scene)
+
+        # Désactiver les scrollbars
+        self.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+
+        # Activer l'antialiasing (plus pro visuellement)
+        self.setRenderHints(self.renderHints() | 
+                            QPainter.RenderHint.Antialiasing)
+
+        # Items du layout
+        self._layout_items = {}
+        self.zones = {}
+        self.controller = None
+        self.current_highlight = None
+
+        # Debug : ajouter un cadre orange pour visualiser les dimensions de la scène
+        cadre = QGraphicsRectItem(0, 0, AppConfig.REFERENCE_CANVAS_WIDTH, AppConfig.REFERENCE_CANVAS_HEIGHT)
+        cadre.setPen(QPen(QColor("orange")))
+        self.scene.addItem(cadre)
+
+        # Initialiser la scene avec la taille actuelle
+        self.resize(AppConfig.REFERENCE_CANVAS_WIDTH, AppConfig.REFERENCE_CANVAS_HEIGHT)
+        
+
 
     # =========================
     # 1️⃣ SIGNAUX PUBLICS
@@ -464,15 +502,29 @@ class CanvasView(QGraphicsView):
         print(f"Handling state drop in CanvasView: code={code}, label={label}, global_pos={global_pos}, scene_pos={scene_pos}")
         # Bloc ajouté uniquement par StatesController.on_state_dropped (taille adaptée)
         
-    # =====================================
-    # Resize automatique
-    # =====================================
+    # =========================
+    # Resize handler
+    # =========================
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        self._sync_scene_size()
-        w = self.viewport().width()
-        h = self.viewport().height()
-        self.resizeSceneRequested.emit(w, h)
+
+        view_width = self.viewport().width()
+        view_height = self.viewport().height()
+
+        scale_x = view_width / AppConfig.REFERENCE_CANVAS_WIDTH
+        scale_y = view_height / AppConfig.REFERENCE_CANVAS_HEIGHT
+
+        # garder les proportions
+        scale = min(scale_x, scale_y)
+
+        # Reset transformation
+        self.resetTransform()
+
+        # Appliquer le zoom global
+        self.scale(scale, scale)
+
+        # Centrer la scène
+        self.centerOn(AppConfig.REFERENCE_CANVAS_WIDTH / 2, AppConfig.REFERENCE_CANVAS_HEIGHT / 2)
             
     # =========================
     # 3️⃣ ÉVÉNEMENTS QT (ÉMISSION)
@@ -511,42 +563,28 @@ class CanvasView(QGraphicsView):
     def clear(self):
         self.scene.clear()
 
-    # =====================================================
-    # Construction des blocs
-    # =====================================================
+    # =========================
+    # Dessin ou mise à jour des blocs
+    # =========================
     def draw_layout_blocks(self, layout_data):
-
-        # ---- Première création ----
+        # Création initiale (une seule fois)
         if not self._layout_items:
             for key, block in layout_data.items():
                 item = LayoutBlockGraphicsObject(key, block)
                 self.scene.addItem(item)
                 self._layout_items[key] = item
-                self.zones[key] = item
+                self.zones[key] = item  
             return
-        
-        # ---- Supprimer blocs disparus ----
-        for key in list(self._layout_items.keys()):
-            if key not in layout_data:
-                self.scene.removeItem(self._layout_items[key])
-                del self._layout_items[key]
-                if key in self.zones:
-                    del self.zones[key]
-
-        # ---- Mise à jour blocs existants ----
+        # Mise à jour simple (toujours 3 blocs)
         for key, block in layout_data.items():
             if key in self._layout_items:
                 self._layout_items[key].resize_block(block)
-            else:
-                item = LayoutBlockGraphicsObject(key, block)
-                self.scene.addItem(item)
-                self._layout_items[key] = item
-                self.zones[key] = item    
                 
     # =====================================================
     # Construction des Etats
     # =====================================================
     def draw_state_blocks(self, states):
+        return
         for state in states:
             graphics_item = StateGraphicsItem(state)
             self.scene.addItem(graphics_item)

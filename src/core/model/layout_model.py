@@ -14,6 +14,7 @@ class LayoutModel:
         pad = AppConfig.PAD
         w = self.canvas_width
         h = self.canvas_height
+        print(f"[LayoutModel] Building default layout for canvas {w}x{h}")
 
         return {
             "A": LayoutBlock(

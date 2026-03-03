@@ -15,7 +15,10 @@ class CanvasController(QObject):
         self.canvas.resizeSceneRequested.connect(self.on_resize_scene)
 
     def on_resize_scene(self, w, h):
-        if self.layout_controller:
-            self.layout_controller.on_resize_layout(w, h)
+        
         if self.states_controller:
             self.states_controller.on_resize_states(w, h)
+            print(f"    CanvasController: 1 ==> states_controller")
+        if self.layout_controller:
+            self.layout_controller.on_resize_layout(w, h)
+            print(f"    CanvasController: 2 ==> layout_controller")

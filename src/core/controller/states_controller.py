@@ -10,16 +10,6 @@ from core.model.states_model import StatesModel
 from core.config.app_config import AppConfig
 
 class StatesController(BaseModeController):
-    def set_state_blocks_right_click(self, enabled: bool):
-        """Active ou désactive le clic droit sur tous les blocs états du canvas."""
-        for item in self.canvas.scene.items():
-            if isinstance(item, EtatGraphicsObject):
-                item.set_right_click_enabled(enabled)
-
-
-    def update_canvas_reference(self):
-        pass
-
     def __init__(self, canvas, palette):
         super().__init__(canvas)
         self.palette = palette
@@ -32,6 +22,15 @@ class StatesController(BaseModeController):
         self.canvas.stateDropped.connect(self.on_state_dropped)
         # Mise à jour initiale de la palette
         self.update_palette()
+
+    def set_state_blocks_right_click(self, enabled: bool):
+        """Active ou désactive le clic droit sur tous les blocs états du canvas."""
+        for item in self.canvas.scene.items():
+            if isinstance(item, EtatGraphicsObject):
+                item.set_right_click_enabled(enabled)
+
+    def update_canvas_reference(self):
+        pass
 
     def get_drawn_state_codes(self):
         """Retourne la liste des codes des états déjà dessinés sur le canvas."""
@@ -71,15 +70,13 @@ class StatesController(BaseModeController):
             self.canvas.scene.addItem(item)
         self.update_palette()
         
-
-    
-
     def on_resize_states(self, w, h):
         """
         Redimensionne le canvas et ses items.
         - Scale Qt pour l'affichage
         - Met à jour les positions/logiques x/y
         """
+        
         if w <= 0 or h <= 0:
             return
 
@@ -118,10 +115,11 @@ class StatesController(BaseModeController):
         self.canvas.apply_states_interactive()
 
         # Debug : contrôle des x, y
-        print(f"[DEBUG] Canvas scaled: scale_x={scale_x:.3f}, scale_y={scale_y:.3f}")
-        for item in self.canvas.scene.items():
-            if isinstance(item, EtatGraphicsObject):
-                print(f"Item {item.code}: x={item.x}, y={item.y}, w={item.width}, h={item.height}")     
+        #print(f"[DEBUG] Canvas scaled: scale_x={scale_x:.3f}, scale_y={scale_y:.3f}")
+        #for item in self.canvas.scene.items():
+        #    if isinstance(item, EtatGraphicsObject):
+        #        print(f"Item {item.code}: x={item.x}, y={item.y}, w={item.width}, h={item.height}") 
+        print(f"StatesController: on_resize_states")    
 
     # =========================
     # RESET
@@ -148,12 +146,12 @@ class StatesController(BaseModeController):
             item = EtatGraphicsObject(
                 etat.code,
                 etat.label,
-                int(getattr(etat, "w", 40) * scale_x),
-                int(getattr(etat, "h", 30) * scale_y)
+                etat.w,
+                etat.h
             )
             item.setPos(
-                int(getattr(etat, "x", 0) * scale_x),
-                int(getattr(etat, "y", 0) * scale_y)
+                etat.x,
+                etat.y
             )
             item.deleteRequested.connect(self.on_state_delete_requested)
             self.canvas.scene.addItem(item)
@@ -166,7 +164,9 @@ class StatesController(BaseModeController):
     # LOAD
     # =========================
     def load_states(self):
-        dialog = QFileDialog(self.palette)
+        default_dir = os.path.join(os.path.dirname(__file__), '../data/etats')
+        default_dir = os.path.abspath(default_dir)
+        dialog = QFileDialog(self.palette, "Ouvrir états", default_dir)
         dialog.setNameFilter("JSON (*.json)")
         dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptOpen)
 
@@ -190,6 +190,7 @@ class StatesController(BaseModeController):
             item.setPos(etat["x"], etat["y"])
             item.deleteRequested.connect(self.on_state_delete_requested)
             self.canvas.scene.addItem(item)
+            
     def on_state_delete_requested(self, code):
         """Supprime le bloc état du canvas et met à jour la palette."""
         
@@ -208,7 +209,9 @@ class StatesController(BaseModeController):
     # SAVE
     # =========================
     def save_states(self):
-        dialog = QFileDialog(self.palette)
+        default_dir = os.path.join(os.path.dirname(__file__), '../data/etats')
+        default_dir = os.path.abspath(default_dir)
+        dialog = QFileDialog(self.palette, "Sauvegarder états", default_dir)
         dialog.setNameFilter("JSON (*.json)")
         dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
 

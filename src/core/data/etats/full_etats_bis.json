@@ -1,0 +1,130 @@
+[
+  {
+    "code": "D3",
+    "label": "Production tout de même",
+    "x": 408,
+    "y": 546,
+    "w": 303,
+    "h": 149
+  },
+  {
+    "code": "D2",
+    "label": "Diagnostic et/ou traitement de défaillance",
+    "x": 103,
+    "y": 541,
+    "w": 229,
+    "h": 149
+  },
+  {
+    "code": "D1",
+    "label": "Arrêt d'urgence",
+    "x": 93,
+    "y": 770,
+    "w": 660,
+    "h": 88
+  },
+  {
+    "code": "F6",
+    "label": "Marches de test",
+    "x": 1335,
+    "y": 627,
+    "w": 169,
+    "h": 255
+  },
+  {
+    "code": "F5",
+    "label": "Marches de vérification dans l'ordre",
+    "x": 1336,
+    "y": 241,
+    "w": 168,
+    "h": 338
+  },
+  {
+    "code": "F4",
+    "label": "Marches de vérification dans le désordre",
+    "x": 1331,
+    "y": 43,
+    "w": 170,
+    "h": 161
+  },
+  {
+    "code": "F3",
+    "label": "Marches de clôture",
+    "x": 1116,
+    "y": 29,
+    "w": 125,
+    "h": 142
+  },
+  {
+    "code": "F2",
+    "label": "Marches de préparation",
+    "x": 838,
+    "y": 43,
+    "w": 126,
+    "h": 144
+  },
+  {
+    "code": "F1",
+    "label": "Production normale",
+    "x": 839,
+    "y": 649,
+    "w": 396,
+    "h": 301
+  },
+  {
+    "code": "A7",
+    "label": "Mise P.O. dans état déterminé",
+    "x": 140,
+    "y": 194,
+    "w": 218,
+    "h": 84
+  },
+  {
+    "code": "A6",
+    "label": "Mise P.O. dans l'état initial",
+    "x": 81,
+    "y": 53,
+    "w": 282,
+    "h": 100
+  },
+  {
+    "code": "A5",
+    "label": "Préparation pour remise en route après défaillance",
+    "x": 79,
+    "y": 299,
+    "w": 283,
+    "h": 147
+  },
+  {
+    "code": "A4",
+    "label": "Arrêt obtenu",
+    "x": 506,
+    "y": 197,
+    "w": 221,
+    "h": 82
+  },
+  {
+    "code": "A3",
+    "label": "Arrêt demandé dans un état déterminé",
+    "x": 595,
+    "y": 325,
+    "w": 135,
+    "h": 112
+  },
+  {
+    "code": "A2",
+    "label": "Arrêt demandé en fin de cycle",
+    "x": 428,
+    "y": 301,
+    "w": 135,
+    "h": 148
+  },
+  {
+    "code": "A1",
+    "label": "Arrêt dans état initial",
+    "x": 432,
+    "y": 57,
+    "w": 294,
+    "h": 109
+  }
+]

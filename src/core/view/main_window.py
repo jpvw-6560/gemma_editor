@@ -36,10 +36,10 @@ class MainWindow(QMainWindow):
         self.resize(960, 540)
         self.app_name = "<Aucune application>"
         #self.showMaximized()
-        print(f"MainWindow resized with: self.resize(960, 540) width:{self.width()}")
+        #print(f"MainWindow resized with: self.resize(960, 540) width:{self.width()}")
         screen = self.screen()
-        print("Screen geometry:", screen.geometry())
-        print("Available geometry:", screen.availableGeometry())
+        #print("Screen geometry:", screen.geometry())
+        #print("Available geometry:", screen.availableGeometry())
         # =========================
         # Canvas central
         # =========================
@@ -70,13 +70,13 @@ class MainWindow(QMainWindow):
                 self.states_palette = child
                 break
         if self.states_palette:
-            print(f"[DEBUG] Instance StatesPalette utilisée : {self.states_palette} (id={id(self.states_palette)})")
-            print(f"[DEBUG] Instance CanvasView utilisée : {self.canvas} (id={id(self.canvas)})")
+            #print(f"[DEBUG] Instance StatesPalette utilisée : {self.states_palette} (id={id(self.states_palette)})")
+            #print(f"[DEBUG] Instance CanvasView utilisée : {self.canvas} (id={id(self.canvas)})")
             def traced_handle_state_drop(code, label, global_pos):
                 print(f"[TRACE] Signal stateDropped reçu dans MainWindow : code={code}, label={label}, global_pos={global_pos}")
                 self.canvas.handle_state_drop(code, label, global_pos)
             self.states_palette.stateDropped.connect(traced_handle_state_drop)
-            print(f"Connexion signal stateDropped : {self.states_palette} -> {self.canvas} (avec traçage)")
+            #print(f"Connexion signal stateDropped : {self.states_palette} -> {self.canvas} (avec traçage)")
 
     
 
@@ -157,7 +157,7 @@ class MainWindow(QMainWindow):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        print(f"MainWindow resized: width={self.width()}, height={self.height()}")
+        #  print(f"MainWindow resized: width={self.width()}, height={self.height()}")
 
     def set_mode_button_style(self, mode: str):
         """Met à jour le style des boutons Layout/Etats/Transitions/Auditer/Générer selon le mode actif."""
