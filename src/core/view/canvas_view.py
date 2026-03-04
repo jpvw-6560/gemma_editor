@@ -20,6 +20,8 @@ import os
 # Bloc état redimensionnable sans cadre blanc
 # ===============================
 class EtatGraphicsObject(QGraphicsObject):
+            
+        
     # Signal pour demander la suppression du bloc
     deleteRequested = pyqtSignal(str)
 
@@ -43,14 +45,25 @@ class EtatGraphicsObject(QGraphicsObject):
         self.handle_visible = True  # Par défaut, visible
         self._border_color = Qt.GlobalColor.black  # Bordure noire par défaut
         self._states_interactive = True  # Par défaut, le clic droit est actif
+        self.update_handle_position()
+        
+    def setPos(self, *args, **kwargs):
+                super().setPos(*args, **kwargs)
+                self.update_handle_position()
 
     def boundingRect(self):
         return QRectF(0, 0, self.width, self.height)
 
+    def update_handle_position(self):
+            self.handle_pos = QPointF(self.width - self.handle_size, self.height - self.handle_size)
+            self.update()
+            
     def paint(self, painter, option, widget=None):
         # Rectangle principal
+        
+        painter.setPen(QPen(self._border_color, 2))  
         painter.setBrush(QBrush(QColor(100, 200, 255)))
-        painter.setPen(QPen(self._border_color, 2))
+      
         painter.drawRect(0, 0, int(self.width), int(self.height))
 
         # Cercle
@@ -87,6 +100,7 @@ class EtatGraphicsObject(QGraphicsObject):
                 self.handle_size,
                 self.handle_size
             )
+            
 
     def set_handle_visible(self, visible: bool):
         self.handle_visible = visible
@@ -100,9 +114,11 @@ class EtatGraphicsObject(QGraphicsObject):
         if canvas_view:
             print(f"Mouse press on state : {canvas_view.action_for_states}")
             action_for_states = canvas_view.action_for_states
+
         else:
             print("Mouse press on state : (vue non trouvée)")
             action_for_states = None
+        self.animate_state_block_highlight()
         if event.button() == Qt.MouseButton.RightButton:
             if not action_for_states:
                 print("Clic droit désactivé sur les blocs état")
@@ -121,8 +137,7 @@ class EtatGraphicsObject(QGraphicsObject):
                 self.deleteRequested.emit(self.code)
             # Désélectionner la bordure après
             self.animate_state_block_unhighlight()
-            QGraphicsView.TransformationAnchor,
-            QGraphicsView.ResizeAnchor
+            
         else:
             if self._on_handle(event.pos()):
                 self._dragging_handle = True
@@ -143,16 +158,20 @@ class EtatGraphicsObject(QGraphicsObject):
             new_height = max(event.pos().y(), 30)
             self.width = new_width
             self.height = new_height
-            self.handle_pos = QPointF(self.width - self.handle_size, self.height - self.handle_size)
             self.prepareGeometryChange()
-            self.update()
+            self.update_handle_position()
         else:
             super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
-        print(f"Mouse release on state : dragging_handle={self._dragging_handle}")
-        self._dragging_handle = False
-        super().mouseReleaseEvent(event)
+            print(f"Mouse release on state : dragging_handle={self._dragging_handle}")
+            self._dragging_handle = False
+            super().mouseReleaseEvent(event)
+            # Si l'état n'est plus sélectionné, remettre la bordure à la couleur normale
+            print(f"State selected: {self.isSelected()}")
+            if self.isSelected():
+                print("State released, unhighlighting")
+                self.animate_state_block_unhighlight()
 
     def _on_handle(self, pos):
         return QRectF(self.handle_pos.x(), self.handle_pos.y(), self.handle_size, self.handle_size).contains(pos)
