@@ -1,3 +1,52 @@
+from PyQt6.QtWidgets import QGraphicsPathItem
+from PyQt6.QtCore import QObject
+from PyQt6.QtGui import QPainterPath
+# ===============================
+# Flèche de transition orthogonale
+# ===============================
+class TransitionArrow(QGraphicsPathItem, QObject):
+    def __init__(self, start_item, end_item):
+        QGraphicsPathItem.__init__(self)
+        QObject.__init__(self)
+        self.start_item = start_item
+        self.end_item = end_item
+        self.setZValue(-1)  # Dessous les blocs
+        self.pen = QPen(Qt.GlobalColor.red, 2)
+        self.setPen(self.pen)
+        self.update_arrow()
+
+    def update_arrow(self):
+        # Points de départ et d'arrivée (centres des blocs)
+        start = self.start_item.sceneBoundingRect().center()
+        end = self.end_item.sceneBoundingRect().center()
+        path = QPainterPath()
+        path.moveTo(start)
+        # Flèche à angles droits : horizontale puis verticale
+        mid_x = end.x()
+        mid_y = start.y()
+        path.lineTo(mid_x, mid_y)
+        path.lineTo(end.x(), end.y())
+        # Ajout de la tête de flèche
+        self._draw_arrow_head(path, end, mid_x, mid_y)
+        self.setPath(path)
+
+    def _draw_arrow_head(self, path, end, mid_x, mid_y):
+        # Dessine une petite tête de flèche à la fin
+        import math
+        arrow_size = 12
+        angle = math.atan2(end.y() - mid_y, end.x() - mid_x)
+        p1 = QPointF(
+            end.x() - arrow_size * math.cos(angle - math.pi / 6),
+            end.y() - arrow_size * math.sin(angle - math.pi / 6)
+        )
+        p2 = QPointF(
+            end.x() - arrow_size * math.cos(angle + math.pi / 6),
+            end.y() - arrow_size * math.sin(angle + math.pi / 6)
+        )
+        path.moveTo(end)
+        path.lineTo(p1)
+        path.moveTo(end)
+        path.lineTo(p2)
 from PyQt6.QtWidgets import (
     QGraphicsView,
     QGraphicsScene,
@@ -177,7 +226,7 @@ class EtatGraphicsObject(QGraphicsObject):
         super().mouseReleaseEvent(event)
         # Si l'état n'est plus sélectionné, remettre la bordure à la couleur normale
         print(f"State selected: {self.isSelected()}")
-        if self.isSelected():
+        if not self.isSelected():
             print("State released, unhighlighting")
             self.animate_state_block_unhighlight()
 
