@@ -42,6 +42,7 @@ class EtatGraphicsObject(QGraphicsObject):
         )
         self.handle_pos = QPointF(width - self.handle_size, height - self.handle_size)
         self._dragging_handle = False
+        self._handle_pressed = False  # Pour la couleur du handle
         self.handle_visible = True  # Par défaut, visible
         self._border_color = Qt.GlobalColor.black  # Bordure noire par défaut
         self._states_interactive = True  # Par défaut, le clic droit est actif
@@ -92,7 +93,10 @@ class EtatGraphicsObject(QGraphicsObject):
 
         # Handle (affiché seulement si handle_visible)
         if self.handle_visible:
-            painter.setBrush(QBrush(Qt.GlobalColor.darkGray))
+            if self._handle_pressed:
+                painter.setBrush(QBrush(Qt.GlobalColor.red))
+            else:
+                painter.setBrush(QBrush(Qt.GlobalColor.darkGray))
             painter.setPen(QPen(Qt.GlobalColor.black, 1))
             painter.drawRect(
                 int(self.handle_pos.x()),
@@ -141,6 +145,8 @@ class EtatGraphicsObject(QGraphicsObject):
         else:
             if self._on_handle(event.pos()):
                 self._dragging_handle = True
+                self._handle_pressed = True
+                self.update()
             else:
                 super().mousePressEvent(event)
         
@@ -164,14 +170,16 @@ class EtatGraphicsObject(QGraphicsObject):
             super().mouseMoveEvent(event)
 
     def mouseReleaseEvent(self, event):
-            print(f"Mouse release on state : dragging_handle={self._dragging_handle}")
-            self._dragging_handle = False
-            super().mouseReleaseEvent(event)
-            # Si l'état n'est plus sélectionné, remettre la bordure à la couleur normale
-            print(f"State selected: {self.isSelected()}")
-            if self.isSelected():
-                print("State released, unhighlighting")
-                self.animate_state_block_unhighlight()
+        print(f"Mouse release on state : dragging_handle={self._dragging_handle}")
+        self._dragging_handle = False
+        self._handle_pressed = False
+        self.update()
+        super().mouseReleaseEvent(event)
+        # Si l'état n'est plus sélectionné, remettre la bordure à la couleur normale
+        print(f"State selected: {self.isSelected()}")
+        if self.isSelected():
+            print("State released, unhighlighting")
+            self.animate_state_block_unhighlight()
 
     def _on_handle(self, pos):
         return QRectF(self.handle_pos.x(), self.handle_pos.y(), self.handle_size, self.handle_size).contains(pos)
