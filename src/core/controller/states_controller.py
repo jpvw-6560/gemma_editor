@@ -122,6 +122,25 @@ class StatesController(BaseModeController):
         print(f"StatesController: on_resize_states")    
 
     # =========================
+    # LOAD FROM DATA (sans FileDialog)
+    # =========================
+    def load_states_from_data(self, etats: list):
+        """Charge les états depuis une liste de dicts (code, label, x, y, w, h)."""
+        self.canvas.remove_all_state_blocks()
+        for etat in etats:
+            item = EtatGraphicsObject(
+                etat["code"],
+                etat["label"],
+                etat["w"],
+                etat["h"]
+            )
+            item.setPos(etat["x"], etat["y"])
+            item.deleteRequested.connect(self.on_state_delete_requested)
+            self.canvas.scene.addItem(item)
+        self.canvas.apply_states_interactive()
+        self.update_palette()
+
+    # =========================
     # RESET
     # =========================
     def reset_states(self):
@@ -158,7 +177,7 @@ class StatesController(BaseModeController):
 
         self.canvas.apply_states_interactive()
         self.update_palette()
-        MsgToast.success("Reset", "Etats réinitialisés", parent=self.palette)
+        MsgToast.success("Reset", "Etats réinitialisés", parent=self.canvas.window())
 
     # =========================
     # LOAD
@@ -192,18 +211,30 @@ class StatesController(BaseModeController):
             self.canvas.scene.addItem(item)
             
     def on_state_delete_requested(self, code):
-        """Supprime le bloc état du canvas et met à jour la palette."""
-        
-        # Supprimer le bloc du canvas
-        for item in self.canvas.scene.items():
+        """Supprime le bloc état, toutes ses flèches connectées, et met à jour la palette."""
+        from core.view.canvas_view import TransitionArrow
+
+        for item in list(self.canvas.scene.items()):
             if isinstance(item, EtatGraphicsObject) and item.code == code:
+                # Supprimer proprement toutes les flèches connectées à cet état
+                for arrow in list(item.arrows):
+                    try:
+                        arrow._clear_handles()
+                        # Désenregistrer la flèche depuis l'autre état
+                        other = arrow.end_item if (arrow.start_item is item) else arrow.start_item
+                        try:
+                            if arrow in other.arrows:
+                                other.arrows.remove(arrow)
+                        except RuntimeError:
+                            pass
+                        if arrow.scene():
+                            arrow.scene().removeItem(arrow)
+                    except RuntimeError:
+                        pass
                 self.canvas.scene.removeItem(item)
                 break
-        # Mettre à jour la palette
         self.update_palette()
-
-        self.update_palette()
-        MsgToast.success("Chargement", "Etats chargés", parent=self.palette)
+        MsgToast.success("Suppression", f"État {code} supprimé.", parent=self.canvas.window())
 
     # =========================
     # SAVE
@@ -238,7 +269,7 @@ class StatesController(BaseModeController):
         with open(file_path, "w", encoding="utf-8") as f:
             json.dump(etats, f, indent=2, ensure_ascii=False)
 
-        MsgToast.success("Sauvegarde", "Etats sauvegardés", parent=self.palette)
+        MsgToast.success("Sauvegarde", "Etats sauvegardés", parent=self.canvas.window())
 
     def connect(self):
         print("States mode activated")

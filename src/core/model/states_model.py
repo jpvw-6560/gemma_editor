@@ -3,25 +3,94 @@ from core.model.state_block import StateBlock
 
 
 # =========================
-# Données internes (pas d'import) Coordonnées valables pour fullSize Window 1920x1080
+# Positions dérivées du fichier de référence :
+#   /doc/le_gemma_plus_fleches.gif  (803×595)
+# et du PDF GEMMA-vide.pdf (page 792×612 après rotation).
+# Scalée sur le canvas de référence : 1620×1020.
 # =========================
 STATE_BLOCKS = [
-    {"code": "D3", "label": "Production tout de même", "x": 390, "y": 546, "w": 290, "h": 149},
-    {"code": "D2", "label": "Diagnostic et/ou traitement de défaillance", "x": 99, "y": 541, "w": 219, "h": 149},
-    {"code": "D1", "label": "Arrêt d'urgence", "x": 89, "y": 770, "w": 631, "h": 88},
-    {"code": "F6", "label": "Marches de test", "x": 1200, "y": 623, "w": 162, "h": 255},
-    {"code": "F5", "label": "Marches de vérification dans l'ordre", "x": 1200, "y": 244, "w": 161, "h": 338},
-    {"code": "F4", "label": "Marches de vérification dans le désordre", "x": 1200, "y": 41, "w": 163, "h": 161},
-    {"code": "F3", "label": "Marches de clôture", "x": 900, "y": 227, "w": 120, "h": 142},
-    {"code": "F2", "label": "Marches de préparation", "x": 743, "y": 225, "w": 121, "h": 144},
-    {"code": "F1", "label": "Production normale", "x": 651, "y": 422, "w": 379, "h": 301},
-    {"code": "A7", "label": "Mise P.O. dans état déterminé", "x": 134, "y": 194, "w": 209, "h": 84},
-    {"code": "A6", "label": "Mise P.O. dans l'état initial", "x": 78, "y": 53, "w": 270, "h": 100},
-    {"code": "A5", "label": "Préparation pour remise en route après défaillance", "x": 76, "y": 299, "w": 271, "h": 147},
-    {"code": "A4", "label": "Arrêt obtenu", "x": 484, "y": 197, "w": 212, "h": 82},
-    {"code": "A3", "label": "Arrêt demandé dans un état déterminé", "x": 569, "y": 325, "w": 129, "h": 112},
-    {"code": "A2", "label": "Arrêt demandé en fin de cycle", "x": 409, "y": 301, "w": 129, "h": 148},
-    {"code": "A1", "label": "Arrêt dans état initial", "x": 413, "y": 57, "w": 281, "h": 109},
+    # Positions extraites par analyse BFS du GIF de référence
+    # le_gemma_plus_fleches.gif (803×595) → canvas 1620×1020
+    {
+        "code": "A1",
+        "label": "Arrêt dans état initial",
+        "x": 510, "y": 110, "w": 266, "h": 75
+    },
+    {
+        "code": "A2",
+        "label": "Arrêt demandé en fin de cycle",
+        "x": 506, "y": 425, "w": 109, "h": 213
+    },
+    {
+        "code": "A3",
+        "label": "Arrêt demandé dans un état déterminé",
+        "x": 673, "y": 425, "w": 107, "h": 161
+    },
+    {
+        "code": "A4",
+        "label": "Arrêt obtenu",
+        "x": 589, "y": 264, "w": 192, "h": 96
+    },
+    {
+        "code": "A5",
+        "label": "Préparation pour remise en route après défaillance",
+        "x": 147, "y": 425, "w": 270, "h": 213
+    },
+    {
+        "code": "A6",
+        "label": "Mise P.O. dans l'état initial",
+        "x": 147, "y": 106, "w": 270, "h": 84
+    },
+    {
+        "code": "A7",
+        "label": "Mise P.O. dans état déterminé",
+        "x": 192, "y": 264, "w": 226, "h": 96
+    },
+    {
+        "code": "D1",
+        "label": "Arrêt d'urgence",
+        "x": 147, "y": 837, "w": 633, "h": 84
+    },
+    {
+        "code": "D2",
+        "label": "Diagnostic et/ou traitement de défaillance",
+        "x": 192, "y": 684, "w": 226, "h": 87
+    },
+    {
+        "code": "D3",
+        "label": "Production tout de même",
+        "x": 506, "y": 684, "w": 274, "h": 87
+    },
+    {
+        "code": "F1",
+        "label": "Production normale",
+        "x": 946, "y": 466, "w": 359, "h": 305
+    },
+    {
+        "code": "F2",
+        "label": "Marches de préparation",
+        "x": 1031, "y": 266, "w": 109, "h": 153
+    },
+    {
+        "code": "F3",
+        "label": "Marches de clôture",
+        "x": 1196, "y": 266, "w": 109, "h": 153
+    },
+    {
+        "code": "F4",
+        "label": "Marches de vérification dans le désordre",
+        "x": 1428, "y": 84, "w": 147, "h": 144
+    },
+    {
+        "code": "F5",
+        "label": "Marches de vérification dans l'ordre",
+        "x": 1428, "y": 293, "w": 147, "h": 386
+    },
+    {
+        "code": "F6",
+        "label": "Marches de test",
+        "x": 1428, "y": 729, "w": 147, "h": 192
+    },
 ]
 
 

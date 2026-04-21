@@ -1,0 +1,130 @@
+════════════════════════════════════════════════════════════
+  Grafcet de Production Normale (ébauche)
+════════════════════════════════════════════════════════════
+Ébauche du cycle de production issue du GEMMA.
+Les actions des étapes sont à remplir selon le process.
+La séquence F2→F1 (préparation → production) est extraite automatiquement.
+
+── ÉTAPES ──────────────────────────────────────────────
+  [ 0]  GPN_Attente ◆ (initiale)
+        Attente départ cycle
+        → # Pré-actions à compléter
+  [ 1]  GPN_F2
+        Marches de préparation
+        → # --- Étape F2 ---
+        → # Actionneurs à compléter
+  [ 2]  GPN_F3
+        Marches de clôture
+        → # --- Étape F3 ---
+        → # Actionneurs à compléter
+  [ 3]  GPN_F1
+        Production normale
+        → # --- Étape F1 ---
+        → # Actionneurs à compléter
+  [ 4]  GPN_F4
+        Marches de vérification dans le désordre
+        → # --- Étape F4 ---
+        → # Actionneurs à compléter
+  [ 5]  GPN_F5
+        Marches de vérification dans l'ordre
+        → # --- Étape F5 ---
+        → # Actionneurs à compléter
+  [ 6]  GPN_F6
+        Marches de test
+        → # --- Étape F6 ---
+        → # Actionneurs à compléter
+
+── TRANSITIONS ─────────────────────────────────────────
+  [ 0] ──( Mode_preparation )──▶ [ 1]  # Démarrage → F2
+  [ 3] ──( Mode_cloture )──▶ [ 2]  # F1 → F3
+  [ 3] ──( Mode_verif_libre )──▶ [ 4]  # F1 → F4
+  [ 3] ──( Mode_verif_seq )──▶ [ 5]  # F1 → F5
+  [ 3] ──( Mode_test )──▶ [ 6]  # F1 → F6
+  [ 1] ──( Preparation_ok )──▶ [ 3]  # F2 → F1
+  [ 5] ──( Fin_verif )──▶ [ 3]  # F5 → F1
+  [ 5] ──( Passage_verif_libre )──▶ [ 4]  # F5 → F4
+  [ 6] ──( Fin_test )──▶ [ 3]  # F6 → F1
+  [ 3] ──( Stop )──▶ [ 0]  # Fin de cycle → Attente
+
+── AVERTISSEMENTS ──────────────────────────────────────
+  ⚠  GPN généré en ébauche : les actions des étapes sont à compléter manuellement.
+  ⚠  La séquence interne de production dépend du process — seuls les états F et leurs transitions sont extraits du GEMMA.
+
+============================================================
+IL/ST IEC 61131-3
+============================================================
+(* ===== Grafcet de Production Normale (ébauche) ===== *)
+(* Ébauche du cycle de production issue du GEMMA. Les actions des étapes sont à remplir selon le process. La séquence F2→F1 (préparation → production) est extraite automatiquement. *)
+
+(* --- Étapes (BOOL) --- *)
+VAR  GPN_E00 : BOOL := TRUE;  (* Attente départ cycle *)
+VAR  GPN_E01 : BOOL := FALSE;  (* Marches de préparation *)
+VAR  GPN_E02 : BOOL := FALSE;  (* Marches de clôture *)
+VAR  GPN_E03 : BOOL := FALSE;  (* Production normale *)
+VAR  GPN_E04 : BOOL := FALSE;  (* Marches de vérification dans le désordre *)
+VAR  GPN_E05 : BOOL := FALSE;  (* Marches de vérification dans l'ordre *)
+VAR  GPN_E06 : BOOL := FALSE;  (* Marches de test *)
+
+(* --- Actions --- *)
+(* Étape 0 : Attente départ cycle *)
+  # Pré-actions à compléter
+(* Étape 1 : Marches de préparation *)
+  # --- Étape F2 ---
+  # Actionneurs à compléter
+(* Étape 2 : Marches de clôture *)
+  # --- Étape F3 ---
+  # Actionneurs à compléter
+(* Étape 3 : Production normale *)
+  # --- Étape F1 ---
+  # Actionneurs à compléter
+(* Étape 4 : Marches de vérification dans le désordre *)
+  # --- Étape F4 ---
+  # Actionneurs à compléter
+(* Étape 5 : Marches de vérification dans l'ordre *)
+  # --- Étape F5 ---
+  # Actionneurs à compléter
+(* Étape 6 : Marches de test *)
+  # --- Étape F6 ---
+  # Actionneurs à compléter
+
+(* --- Transitions --- *)
+IF GPN_E00 AND (Mode_preparation) THEN  (* Démarrage → F2 *)
+    GPN_E00 := FALSE;
+    GPN_E01 := TRUE;
+END_IF;
+IF GPN_E03 AND (Mode_cloture) THEN  (* F1 → F3 *)
+    GPN_E03 := FALSE;
+    GPN_E02 := TRUE;
+END_IF;
+IF GPN_E03 AND (Mode_verif_libre) THEN  (* F1 → F4 *)
+    GPN_E03 := FALSE;
+    GPN_E04 := TRUE;
+END_IF;
+IF GPN_E03 AND (Mode_verif_seq) THEN  (* F1 → F5 *)
+    GPN_E03 := FALSE;
+    GPN_E05 := TRUE;
+END_IF;
+IF GPN_E03 AND (Mode_test) THEN  (* F1 → F6 *)
+    GPN_E03 := FALSE;
+    GPN_E06 := TRUE;
+END_IF;
+IF GPN_E01 AND (Preparation_ok) THEN  (* F2 → F1 *)
+    GPN_E01 := FALSE;
+    GPN_E03 := TRUE;
+END_IF;
+IF GPN_E05 AND (Fin_verif) THEN  (* F5 → F1 *)
+    GPN_E05 := FALSE;
+    GPN_E03 := TRUE;
+END_IF;
+IF GPN_E05 AND (Passage_verif_libre) THEN  (* F5 → F4 *)
+    GPN_E05 := FALSE;
+    GPN_E04 := TRUE;
+END_IF;
+IF GPN_E06 AND (Fin_test) THEN  (* F6 → F1 *)
+    GPN_E06 := FALSE;
+    GPN_E03 := TRUE;
+END_IF;
+IF GPN_E03 AND (Stop) THEN  (* Fin de cycle → Attente *)
+    GPN_E03 := FALSE;
+    GPN_E00 := TRUE;
+END_IF;

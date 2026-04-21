@@ -39,6 +39,8 @@ class LayoutController(BaseModeController):
 
     def connect(self):
         self.load_layout()
+        print("Layout mode activated")
+        #self.update_palette()
 
     def disconnect(self):
         pass

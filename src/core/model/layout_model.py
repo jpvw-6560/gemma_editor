@@ -11,32 +11,19 @@ class LayoutModel:
         self.blocks = self._build_default_layout()
 
     def _build_default_layout(self) -> dict[str, LayoutBlock]:
-        pad = AppConfig.PAD
-        w = self.canvas_width
-        h = self.canvas_height
-        print(f"[LayoutModel] Building default layout for canvas {w}x{h}")
-
+        # Canvas 1620×1020 — blocs étendus jusqu'aux marges (10 px des bords et entre blocs)
         return {
             "A": LayoutBlock(
-                "A", pad, pad,
-                w // 2 - 2 * pad,
-                h // 2 - 2 * pad,
-                "Procédures d'arrêt"
+                "A", 10, 10, 910, 645,
+                "PROCÉDURES D'ARRÊT"
             ),
             "D": LayoutBlock(
-                "D", pad,
-                h // 2 + pad,
-                w // 2 - 2 * pad,
-                h // 2 - 2 * pad,
-                "Procédures en Défaillance"
+                "D", 10, 665, 910, 345,
+                "PROCÉDURES en DÉFAILLANCE"
             ),
             "F": LayoutBlock(
-                "F",
-                w // 2 + pad,
-                pad,
-                w // 2 - 2 * pad,
-                h - 2 * pad,
-                "Procédures de Fonctionnement"
+                "F", 930, 10, 680, 1000,
+                "PROCÉDURES DE FONCTIONNEMENT"
             ),
         }
 

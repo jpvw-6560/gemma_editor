@@ -7,8 +7,28 @@ class ModeManager:
         self.canvas_controller = None
         self.layout_controller = None
         self.states_controller = None
+        self.transitions_controller = None
 
     def activate(self, mode_name: str):
+
+        # Déconnecter l'ancien CanvasController avant de le remplacer
+        # (évite l'accumulation de connexions à resizeSceneRequested)
+        if self.canvas_controller is not None:
+            try:
+                self.canvas.resizeSceneRequested.disconnect(
+                    self.canvas_controller.on_resize_scene
+                )
+            except (TypeError, RuntimeError):
+                pass
+
+        # Vider la sélection courante pour purger les poignées (SegmentHandle/AttachHandle)
+        # qui sont des QGraphicsObject avec méthodes virtuelles overridées en Python.
+        # Si leur flèche parente perd sa référence Python pendant un changement de mode,
+        # un appel de paint()/boundingRect() C++ sans vtable Python = "pure virtual method called".
+        try:
+            self.canvas.scene.clearSelection()
+        except (RuntimeError, AttributeError):
+            pass
 
         # Nettoyage éventuel
         #if self.current_controller:
@@ -45,6 +65,21 @@ class ModeManager:
             # Activer l'interactivité des états
             self.canvas.set_states_interactive(True)
             self.canvas.action_for_states = True
+        elif mode_name == "transitions":
+            from core.controller.transitions_controller import TransitionsController
+            from core.view.palettes.transitions_palette import TransitionsPalette
+            palette = TransitionsPalette()
+            # Relais du signal drop palette → canvas (si nécessaire)
+            # Exemple : palette.transitionDropped.connect(...)
+            self.transitions_controller = TransitionsController(self.canvas, palette)
+            self.right_menu.set_palette_widget(palette)
+            self.current_controller = self.transitions_controller
+            if hasattr(self.current_controller, "connect"):
+                self.current_controller.connect()
+            # Désactiver l'interactivité des états
+            self.canvas.set_states_interactive(False)
+            self.canvas.action_for_states = False
+            print("Transitions mode activated")
         # (Ré)instanciation du CanvasController à chaque changement de mode
         from core.controller.canvas_controller import CanvasController
         self.canvas_controller = CanvasController(

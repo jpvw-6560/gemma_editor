@@ -1,130 +1,130 @@
 [
   {
-    "code": "D3",
-    "label": "Production tout de même",
-    "x": 390,
-    "y": 546,
-    "w": 290,
-    "h": 149
-  },
-  {
-    "code": "D2",
-    "label": "Diagnostic et/ou traitement de défaillance",
-    "x": 99,
-    "y": 541,
-    "w": 219,
-    "h": 149
-  },
-  {
-    "code": "D1",
-    "label": "Arrêt d'urgence",
-    "x": 89,
-    "y": 770,
-    "w": 631,
-    "h": 88
-  },
-  {
     "code": "F6",
     "label": "Marches de test",
-    "x": 1326,
-    "y": 623,
-    "w": 162,
-    "h": 255
+    "x": 1428,
+    "y": 729,
+    "w": 147,
+    "h": 192
   },
   {
     "code": "F5",
     "label": "Marches de vérification dans l'ordre",
-    "x": 1326,
-    "y": 244,
-    "w": 161,
-    "h": 338
+    "x": 1428,
+    "y": 293,
+    "w": 147,
+    "h": 386
   },
   {
     "code": "F4",
     "label": "Marches de vérification dans le désordre",
-    "x": 1322,
-    "y": 41,
-    "w": 163,
-    "h": 161
+    "x": 1428,
+    "y": 84,
+    "w": 147,
+    "h": 144
   },
   {
     "code": "F3",
     "label": "Marches de clôture",
-    "x": 1099,
-    "y": 227,
-    "w": 120,
-    "h": 142
+    "x": 1196,
+    "y": 266,
+    "w": 109,
+    "h": 153
   },
   {
     "code": "F2",
     "label": "Marches de préparation",
-    "x": 943,
-    "y": 225,
-    "w": 121,
-    "h": 144
+    "x": 1031,
+    "y": 266,
+    "w": 109,
+    "h": 153
   },
   {
     "code": "F1",
     "label": "Production normale",
-    "x": 851,
-    "y": 422,
-    "w": 379,
-    "h": 301
+    "x": 946,
+    "y": 466,
+    "w": 359,
+    "h": 305
+  },
+  {
+    "code": "D3",
+    "label": "Production tout de même",
+    "x": 506,
+    "y": 684,
+    "w": 274,
+    "h": 87
+  },
+  {
+    "code": "D2",
+    "label": "Diagnostic et/ou traitement de défaillance",
+    "x": 192,
+    "y": 684,
+    "w": 226,
+    "h": 87
+  },
+  {
+    "code": "D1",
+    "label": "Arrêt d'urgence",
+    "x": 147,
+    "y": 837,
+    "w": 633,
+    "h": 84
   },
   {
     "code": "A7",
     "label": "Mise P.O. dans état déterminé",
-    "x": 134,
-    "y": 194,
-    "w": 209,
-    "h": 84
+    "x": 192,
+    "y": 264,
+    "w": 226,
+    "h": 96
   },
   {
     "code": "A6",
     "label": "Mise P.O. dans l'état initial",
-    "x": 78,
-    "y": 53,
+    "x": 147,
+    "y": 106,
     "w": 270,
-    "h": 100
+    "h": 84
   },
   {
     "code": "A5",
     "label": "Préparation pour remise en route après défaillance",
-    "x": 76,
-    "y": 299,
-    "w": 271,
-    "h": 147
+    "x": 147,
+    "y": 425,
+    "w": 270,
+    "h": 213
   },
   {
     "code": "A4",
     "label": "Arrêt obtenu",
-    "x": 484,
-    "y": 197,
-    "w": 212,
-    "h": 82
+    "x": 589,
+    "y": 264,
+    "w": 192,
+    "h": 96
   },
   {
     "code": "A3",
     "label": "Arrêt demandé dans un état déterminé",
-    "x": 569,
-    "y": 325,
-    "w": 129,
-    "h": 112
+    "x": 673,
+    "y": 425,
+    "w": 121,
+    "h": 161
   },
   {
     "code": "A2",
     "label": "Arrêt demandé en fin de cycle",
-    "x": 409,
-    "y": 301,
-    "w": 129,
-    "h": 148
+    "x": 506,
+    "y": 425,
+    "w": 109,
+    "h": 213
   },
   {
     "code": "A1",
     "label": "Arrêt dans état initial",
-    "x": 413,
-    "y": 57,
-    "w": 281,
-    "h": 109
+    "x": 510,
+    "y": 110,
+    "w": 266,
+    "h": 75
   }
 ]

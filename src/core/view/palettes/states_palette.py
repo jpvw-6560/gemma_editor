@@ -217,6 +217,7 @@ class StatesPalette(QWidget):
         layout = QVBoxLayout(self)
 
         title = QLabel("Etats")
+        title.setStyleSheet("font-weight: bold; font-size: 16px; margin-bottom: 30px;")
         layout.addWidget(title)
 
         self.states_list = StatesListWidget()

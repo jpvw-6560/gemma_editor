@@ -7,7 +7,6 @@ from core.config.app_config import AppConfig
 
 class MsgToast(QWidget):
     _active_toasts = []
-
     BG_COLORS = {
         "info": "#2d7deb",
         "success": "#32b43c",
@@ -66,6 +65,21 @@ class MsgToast(QWidget):
 
         # Ajouter à la liste des toasts actifs
         MsgToast._active_toasts.append(self)
+        
+
+    def enterEvent(self, event):
+        # Fige la tempo lors du hover
+        if hasattr(self, '_hide_timer') and self._hide_timer.isActive():
+            self._remaining = self._hide_timer.remainingTime()
+            self._hide_timer.stop()
+        event.accept()
+
+    def leaveEvent(self, event):
+        # Relance la tempo lors du leave
+        if hasattr(self, '_remaining') and self._remaining > 0:
+            self._hide_timer.start(self._remaining)
+        event.accept()
+    
 
     # --- Sons ---
     def _load_sound(self):
@@ -106,7 +120,10 @@ class MsgToast(QWidget):
         self.move(int(x), int(y))
         self.show()
         self.fade_in()
-        QTimer.singleShot(self.duration, self.fade_out)
+        self._hide_timer = QTimer(self)
+        self._hide_timer.setSingleShot(True)
+        self._hide_timer.timeout.connect(self.fade_out)
+        self._hide_timer.start(self.duration)
 
     # --- Animations ---
     def fade_in(self):

@@ -1,0 +1,106 @@
+{
+  "nom": "GS",
+  "titre": "Grafcet de Sécurité",
+  "description": "Gère les défaillances et l'arrêt d'urgence.\nÉtape 0 = fonctionnement normal autorisé.\nDès qu'une condition de défaillance est vraie, on bascule vers D1.",
+  "etapes": [
+    {
+      "num": 0,
+      "nom": "Marche_Securite",
+      "label": "Fonctionnement normal autorisé",
+      "actions": [
+        "Autorisation_Marche := 1"
+      ],
+      "initiale": true
+    },
+    {
+      "num": 1,
+      "nom": "GS_D1",
+      "label": "Arrêt d'urgence",
+      "actions": [
+        "# Actions de D1 à compléter"
+      ],
+      "initiale": false
+    },
+    {
+      "num": 2,
+      "nom": "GS_D2",
+      "label": "Diagnostic et/ou traitement de défaillance",
+      "actions": [
+        "# Actions de D2 à compléter"
+      ],
+      "initiale": false
+    },
+    {
+      "num": 3,
+      "nom": "GS_D3",
+      "label": "Production tout de même",
+      "actions": [
+        "# Actions de D3 à compléter"
+      ],
+      "initiale": false
+    },
+    {
+      "num": 4,
+      "nom": "GS_A5",
+      "label": "Préparation pour remise en route après défaillance",
+      "actions": [
+        "# Actions de A5 à compléter"
+      ],
+      "initiale": false
+    },
+    {
+      "num": 5,
+      "nom": "GS_A6",
+      "label": "Mise P.O. dans l'état initial",
+      "actions": [
+        "# Actions de A6 à compléter"
+      ],
+      "initiale": false
+    }
+  ],
+  "transitions": [
+    {
+      "de": 0,
+      "vers": 1,
+      "receptivite": "Defaut",
+      "commentaire": "→ D1 depuis F1, F6"
+    },
+    {
+      "de": 0,
+      "vers": 3,
+      "receptivite": "Mode_degrade",
+      "commentaire": "→ D3 depuis F1"
+    },
+    {
+      "de": 3,
+      "vers": 2,
+      "receptivite": "1",
+      "commentaire": "D3 → D2"
+    },
+    {
+      "de": 2,
+      "vers": 4,
+      "receptivite": "1",
+      "commentaire": "D2 → A5"
+    },
+    {
+      "de": 1,
+      "vers": 2,
+      "receptivite": "1",
+      "commentaire": "D1 → D2"
+    },
+    {
+      "de": 4,
+      "vers": 5,
+      "receptivite": "1",
+      "commentaire": "A5 → A6"
+    },
+    {
+      "de": 5,
+      "vers": 0,
+      "receptivite": "Init_OK",
+      "commentaire": "A6 → Retour marche normale"
+    }
+  ],
+  "avertissements": []
+}

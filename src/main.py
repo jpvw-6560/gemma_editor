@@ -9,7 +9,10 @@ from core.services.toast.toast import MsgToast
 
 def main():
     app = QApplication(sys.argv)
-    
+
+    from core.config.app_config import AppConfig
+    app.setStyleSheet(AppConfig.TOOLTIP_QSS)
+
     # 🔹 Charger la traduction Qt en français ----------------------
     translator = QTranslator()
     translator.load(

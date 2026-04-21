@@ -1,0 +1,328 @@
+[
+  {
+    "de": "A1",
+    "vers": "F1",
+    "condition": "Depart_cycle",
+    "waypoints": [
+      {
+        "x": 776.0,
+        "y": 173.9
+      },
+      {
+        "x": 981.7,
+        "y": 173.9
+      },
+      {
+        "x": 981.7,
+        "y": 466.0
+      }
+    ]
+  },
+  {
+    "de": "A2",
+    "vers": "A1",
+    "condition": "Fin_cycle",
+    "waypoints": [
+      {
+        "x": 560.5,
+        "y": 425.0
+      },
+      {
+        "x": 560.5,
+        "y": 185.0
+      }
+    ]
+  },
+  {
+    "de": "A3",
+    "vers": "A4",
+    "condition": "Arret_obtenu"
+  },
+  {
+    "de": "A4",
+    "vers": "A6",
+    "condition": "Init_position",
+    "waypoints": [
+      {
+        "x": 589.0,
+        "y": 332.0
+      },
+      {
+        "x": 442.0,
+        "y": 332.0
+      },
+      {
+        "x": 422.0,
+        "y": 128.0
+      },
+      {
+        "x": 422.0,
+        "y": 128.0
+      }
+    ]
+  },
+  {
+    "de": "A4",
+    "vers": "F1",
+    "condition": "Remise_en_marche",
+    "waypoints": [
+      {
+        "x": 781.0,
+        "y": 317.0
+      },
+      {
+        "x": 964.3,
+        "y": 317.0
+      },
+      {
+        "x": 964.3,
+        "y": 466.0
+      }
+    ]
+  },
+  {
+    "de": "A5",
+    "vers": "A6",
+    "condition": "Reset_machine",
+    "waypoints": [
+      {
+        "x": 147.0,
+        "y": 531.5
+      },
+      {
+        "x": 173.0,
+        "y": 531.5
+      },
+      {
+        "x": 173.0,
+        "y": 190.0
+      }
+    ]
+  },
+  {
+    "de": "A5",
+    "vers": "A7",
+    "condition": "Mode_reglage",
+    "waypoints": [
+      {
+        "x": 309.5,
+        "y": 425.0
+      },
+      {
+        "x": 309.5,
+        "y": 360.0
+      }
+    ]
+  },
+  {
+    "de": "A6",
+    "vers": "A1",
+    "condition": "Init_OK",
+    "waypoints": [
+      {
+        "x": 417.0,
+        "y": 147.5
+      },
+      {
+        "x": 510.0,
+        "y": 147.5
+      }
+    ]
+  },
+  {
+    "de": "A7",
+    "vers": "A4",
+    "condition": "Arret_obtenu",
+    "waypoints": [
+      {
+        "x": 418.0,
+        "y": 317.0
+      },
+      {
+        "x": 589.0,
+        "y": 317.0
+      }
+    ]
+  },
+  {
+    "de": "A7",
+    "vers": "A6",
+    "condition": "Quitter_reglage",
+    "waypoints": [
+      {
+        "x": 309.5,
+        "y": 264.0
+      },
+      {
+        "x": 309.5,
+        "y": 190.0
+      }
+    ]
+  },
+  {
+    "de": "D1",
+    "vers": "A5",
+    "condition": "Reset_direct",
+    "waypoints": [
+      {
+        "x": 169.0,
+        "y": 837.0
+      },
+      {
+        "x": 167.0,
+        "y": 837.0
+      },
+      {
+        "x": 167.0,
+        "y": 638.0
+      }
+    ]
+  },
+  {
+    "de": "D1",
+    "vers": "D2",
+    "condition": "EU_relachee",
+    "waypoints": [
+      {
+        "x": 305.0,
+        "y": 837.0
+      },
+      {
+        "x": 305.0,
+        "y": 771.0
+      }
+    ]
+  },
+  {
+    "de": "D2",
+    "vers": "A5",
+    "condition": "Acquit_defaut",
+    "waypoints": [
+      {
+        "x": 309.5,
+        "y": 684.0
+      },
+      {
+        "x": 309.5,
+        "y": 638.0
+      }
+    ]
+  },
+  {
+    "de": "F1",
+    "vers": "A2",
+    "condition": "Stop",
+    "waypoints": [
+      {
+        "x": 946.0,
+        "y": 620.0
+      },
+      {
+        "x": 615.0,
+        "y": 620.0
+      }
+    ]
+  },
+  {
+    "de": "F1",
+    "vers": "A3",
+    "condition": "Stop_immediat",
+    "waypoints": [
+      {
+        "x": 946.0,
+        "y": 530.0
+      },
+      {
+        "x": 780.0,
+        "y": 530.0
+      }
+    ]
+  },
+  {
+    "de": "F1",
+    "vers": "D1",
+    "condition": "Defaut",
+    "waypoints": [
+      {
+        "x": 1147.7,
+        "y": 771.0
+      },
+      {
+        "x": 1147.7,
+        "y": 854.6
+      },
+      {
+        "x": 780.0,
+        "y": 854.6
+      }
+    ]
+  },
+  {
+    "de": "F1",
+    "vers": "D2",
+    "condition": "Defaut_direct",
+    "waypoints": [
+      {
+        "x": 990.8,
+        "y": 771.0
+      },
+      {
+        "x": 990.8,
+        "y": 815.0
+      },
+      {
+        "x": 375.2,
+        "y": 815.0
+      },
+      {
+        "x": 375.2,
+        "y": 771.0
+      }
+    ]
+  },
+  {
+    "de": "F1",
+    "vers": "F6",
+    "condition": "Mode_test",
+    "waypoints": [
+      {
+        "x": 1305.0,
+        "y": 740.7
+      },
+      {
+        "x": 1428.0,
+        "y": 740.7
+      }
+    ]
+  },
+  {
+    "de": "F6",
+    "vers": "D1",
+    "condition": "AU",
+    "waypoints": [
+      {
+        "x": 1428.0,
+        "y": 885.0
+      },
+      {
+        "x": 780.0,
+        "y": 885.0
+      }
+    ]
+  },
+  {
+    "de": "F6",
+    "vers": "F1",
+    "condition": "Fin_test",
+    "waypoints": [
+      {
+        "x": 1428.0,
+        "y": 755.0
+      },
+      {
+        "x": 1305.0,
+        "y": 755.0
+      }
+    ]
+  }
+]

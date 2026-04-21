@@ -1,0 +1,154 @@
+{
+  "nom": "GPN",
+  "titre": "Grafcet de Production Normale (ébauche)",
+  "description": "Ébauche du cycle de production issue du GEMMA.\nLes actions des étapes sont à remplir selon le process.\nLa séquence F2→F1 (préparation → production) est extraite automatiquement.",
+  "etapes": [
+    {
+      "num": 0,
+      "nom": "GPN_Attente",
+      "label": "Attente départ cycle",
+      "actions": [
+        "# Pré-actions à compléter"
+      ],
+      "initiale": true
+    },
+    {
+      "num": 1,
+      "nom": "GPN_F2",
+      "label": "Marches de préparation",
+      "actions": [
+        "# --- Étape F2 ---",
+        "# Actionneurs à compléter"
+      ],
+      "initiale": false
+    },
+    {
+      "num": 2,
+      "nom": "GPN_F3",
+      "label": "Marches de clôture",
+      "actions": [
+        "# --- Étape F3 ---",
+        "# Actionneurs à compléter"
+      ],
+      "initiale": false
+    },
+    {
+      "num": 3,
+      "nom": "GPN_F1",
+      "label": "Production normale",
+      "actions": [
+        "# --- Étape F1 ---",
+        "# Actionneurs à compléter"
+      ],
+      "initiale": false
+    },
+    {
+      "num": 4,
+      "nom": "GPN_F4",
+      "label": "Marches de vérification dans le désordre",
+      "actions": [
+        "# --- Étape F4 ---",
+        "# Actionneurs à compléter"
+      ],
+      "initiale": false
+    },
+    {
+      "num": 5,
+      "nom": "GPN_F5",
+      "label": "Marches de vérification dans l'ordre",
+      "actions": [
+        "# --- Étape F5 ---",
+        "# Actionneurs à compléter"
+      ],
+      "initiale": false
+    },
+    {
+      "num": 6,
+      "nom": "GPN_F6",
+      "label": "Marches de test",
+      "actions": [
+        "# --- Étape F6 ---",
+        "# Actionneurs à compléter"
+      ],
+      "initiale": false
+    }
+  ],
+  "transitions": [
+    {
+      "de": 0,
+      "vers": 1,
+      "receptivite": "Mode_preparation",
+      "commentaire": "Démarrage → F2"
+    },
+    {
+      "de": 6,
+      "vers": 3,
+      "receptivite": "Fin_test",
+      "commentaire": "F6 → F1"
+    },
+    {
+      "de": 5,
+      "vers": 4,
+      "receptivite": "Passage_verif_libre",
+      "commentaire": "F5 → F4"
+    },
+    {
+      "de": 5,
+      "vers": 3,
+      "receptivite": "Fin_verif",
+      "commentaire": "F5 → F1"
+    },
+    {
+      "de": 1,
+      "vers": 3,
+      "receptivite": "Preparation_ok",
+      "commentaire": "F2 → F1"
+    },
+    {
+      "de": 3,
+      "vers": 6,
+      "receptivite": "Mode_test",
+      "commentaire": "F1 → F6"
+    },
+    {
+      "de": 3,
+      "vers": 5,
+      "receptivite": "Mode_verif_seq",
+      "commentaire": "F1 → F5"
+    },
+    {
+      "de": 3,
+      "vers": 4,
+      "receptivite": "Mode_verif_libre",
+      "commentaire": "F1 → F4"
+    },
+    {
+      "de": 3,
+      "vers": 2,
+      "receptivite": "Mode_cloture",
+      "commentaire": "F1 → F3"
+    },
+    {
+      "de": 3,
+      "vers": 0,
+      "receptivite": "Fin_cycle",
+      "commentaire": "Fin de cycle → Attente"
+    },
+    {
+      "de": 2,
+      "vers": 0,
+      "receptivite": "Cloture_ok",
+      "commentaire": "F3 → Attente (remappé depuis F3→A1)"
+    },
+    {
+      "de": 4,
+      "vers": 0,
+      "receptivite": "CI",
+      "commentaire": "F4 → Attente (remappé depuis F4→A6)"
+    }
+  ],
+  "avertissements": [
+    "GPN généré en ébauche : les actions des étapes sont à compléter manuellement.",
+    "La séquence interne de production dépend du process — seuls les états F et leurs transitions sont extraits du GEMMA."
+  ]
+}

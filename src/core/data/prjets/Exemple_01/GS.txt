@@ -1,0 +1,93 @@
+════════════════════════════════════════════════════════════
+  Grafcet de Sécurité
+════════════════════════════════════════════════════════════
+Gère les défaillances et l'arrêt d'urgence.
+Étape 0 = fonctionnement normal autorisé.
+Dès qu'une condition de défaillance est vraie, on bascule vers D1.
+
+── ÉTAPES ──────────────────────────────────────────────
+  [ 0]  Marche_Securite ◆ (initiale)
+        Fonctionnement normal autorisé
+        → Autorisation_Marche := 1
+  [ 1]  GS_D1
+        Arrêt d'urgence
+        → # Actions de D1 à compléter
+  [ 2]  GS_D2
+        Diagnostic et/ou traitement de défaillance
+        → # Actions de D2 à compléter
+  [ 3]  GS_D3
+        Production tout de même
+        → # Actions de D3 à compléter
+  [ 4]  GS_A5
+        Préparation pour remise en route après défaillance
+        → # Actions de A5 à compléter
+  [ 5]  GS_A6
+        Mise P.O. dans l'état initial
+        → # Actions de A6 à compléter
+
+── TRANSITIONS ─────────────────────────────────────────
+  [ 0] ──( Defaut + AU )──▶ [ 1]  # Détection défaillance → Arrêt d'urgence
+  [ 4] ──( Reset_machine )──▶ [ 5]  # A5 → A6
+  [ 1] ──( Reset_direct )──▶ [ 4]  # D1 → A5
+  [ 1] ──( EU_relachee )──▶ [ 2]  # D1 → D2
+  [ 2] ──( Acquit_defaut )──▶ [ 4]  # D2 → A5
+  [ 3] ──( Defaut_majeur )──▶ [ 2]  # D3 → D2
+  [ 5] ──( Init_OK )──▶ [ 0]  # A6 → Retour marche normale
+
+============================================================
+IL/ST IEC 61131-3
+============================================================
+(* ===== Grafcet de Sécurité ===== *)
+(* Gère les défaillances et l'arrêt d'urgence. Étape 0 = fonctionnement normal autorisé. Dès qu'une condition de défaillance est vraie, on bascule vers D1. *)
+
+(* --- Étapes (BOOL) --- *)
+VAR  GS_E00 : BOOL := TRUE;  (* Fonctionnement normal autorisé *)
+VAR  GS_E01 : BOOL := FALSE;  (* Arrêt d'urgence *)
+VAR  GS_E02 : BOOL := FALSE;  (* Diagnostic et/ou traitement de défaillance *)
+VAR  GS_E03 : BOOL := FALSE;  (* Production tout de même *)
+VAR  GS_E04 : BOOL := FALSE;  (* Préparation pour remise en route après défaillance *)
+VAR  GS_E05 : BOOL := FALSE;  (* Mise P.O. dans l'état initial *)
+
+(* --- Actions --- *)
+(* Étape 0 : Fonctionnement normal autorisé *)
+  Autorisation_Marche := 1
+(* Étape 1 : Arrêt d'urgence *)
+  # Actions de D1 à compléter
+(* Étape 2 : Diagnostic et/ou traitement de défaillance *)
+  # Actions de D2 à compléter
+(* Étape 3 : Production tout de même *)
+  # Actions de D3 à compléter
+(* Étape 4 : Préparation pour remise en route après défaillance *)
+  # Actions de A5 à compléter
+(* Étape 5 : Mise P.O. dans l'état initial *)
+  # Actions de A6 à compléter
+
+(* --- Transitions --- *)
+IF GS_E00 AND (Defaut + AU) THEN  (* Détection défaillance → Arrêt d'urgence *)
+    GS_E00 := FALSE;
+    GS_E01 := TRUE;
+END_IF;
+IF GS_E04 AND (Reset_machine) THEN  (* A5 → A6 *)
+    GS_E04 := FALSE;
+    GS_E05 := TRUE;
+END_IF;
+IF GS_E01 AND (Reset_direct) THEN  (* D1 → A5 *)
+    GS_E01 := FALSE;
+    GS_E04 := TRUE;
+END_IF;
+IF GS_E01 AND (EU_relachee) THEN  (* D1 → D2 *)
+    GS_E01 := FALSE;
+    GS_E02 := TRUE;
+END_IF;
+IF GS_E02 AND (Acquit_defaut) THEN  (* D2 → A5 *)
+    GS_E02 := FALSE;
+    GS_E04 := TRUE;
+END_IF;
+IF GS_E03 AND (Defaut_majeur) THEN  (* D3 → D2 *)
+    GS_E03 := FALSE;
+    GS_E02 := TRUE;
+END_IF;
+IF GS_E05 AND (Init_OK) THEN  (* A6 → Retour marche normale *)
+    GS_E05 := FALSE;
+    GS_E00 := TRUE;
+END_IF;

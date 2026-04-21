@@ -1,0 +1,131 @@
+{
+  "nom": "Nouveau Grafcet",
+  "etapes": [
+    {
+      "num": 3,
+      "label": "Étape",
+      "actions": [],
+      "initiale": false,
+      "famille": "",
+      "x": -40.0,
+      "y": 140.0
+    },
+    {
+      "num": 2,
+      "label": "Étape",
+      "actions": [],
+      "initiale": false,
+      "famille": "",
+      "x": -40.0,
+      "y": -40.0
+    },
+    {
+      "num": 1,
+      "label": "Étape",
+      "actions": [],
+      "initiale": false,
+      "famille": "",
+      "x": -40.0,
+      "y": -160.0
+    }
+  ],
+  "transitions": [
+    {
+      "idx": 0,
+      "receptivite": "1",
+      "x": -40.0,
+      "y": 200.0
+    },
+    {
+      "idx": 1,
+      "receptivite": "1",
+      "x": -40.0,
+      "y": 40.0
+    },
+    {
+      "idx": 2,
+      "receptivite": "1",
+      "x": -40.0,
+      "y": -100.0
+    }
+  ],
+  "traitements": [],
+  "macros": [],
+  "or_bars": [],
+  "parallel_bars": [],
+  "connectors": [],
+  "liaisons": [
+    {
+      "de": {
+        "type": "etape",
+        "num": 1
+      },
+      "de_port": "bottom",
+      "vers": {
+        "type": "transition",
+        "idx": 2
+      },
+      "vers_port": "top"
+    },
+    {
+      "de": {
+        "type": "transition",
+        "idx": 2
+      },
+      "de_port": "bottom",
+      "vers": {
+        "type": "etape",
+        "num": 2
+      },
+      "vers_port": "top"
+    },
+    {
+      "de": {
+        "type": "etape",
+        "num": 2
+      },
+      "de_port": "bottom",
+      "vers": {
+        "type": "transition",
+        "idx": 1
+      },
+      "vers_port": "top"
+    },
+    {
+      "de": {
+        "type": "transition",
+        "idx": 1
+      },
+      "de_port": "bottom",
+      "vers": {
+        "type": "etape",
+        "num": 3
+      },
+      "vers_port": "top"
+    },
+    {
+      "de": {
+        "type": "etape",
+        "num": 3
+      },
+      "de_port": "bottom",
+      "vers": {
+        "type": "transition",
+        "idx": 0
+      },
+      "vers_port": "top"
+    },
+    {
+      "de": {
+        "type": "transition",
+        "idx": 0
+      },
+      "de_port": "bottom",
+      "vers": {
+        "type": "etape",
+        "num": 1
+      },
+      "vers_port": "top"
+    }
+  ]
+}

@@ -7,8 +7,8 @@ class RightMenu(QWidget):
 
         # Layout principal du RightMenu
         self.layout = QVBoxLayout()
-        self.layout.setContentsMargins(2, 2, 2, 2)
-        self.layout.setSpacing(5)
+        self.layout.setContentsMargins(0,0,0,0)
+        self.layout.setSpacing(0)
         self.setLayout(self.layout)
         self.setFixedWidth(AppConfig.RIGHT_MENU_WIDTH)
 

@@ -1,0 +1,224 @@
+════════════════════════════════════════════════════════════
+  Grafcet de Commande
+════════════════════════════════════════════════════════════
+Gère les procédures de démarrage, d'arrêt normal/d'urgence
+et de remise en route. Couvre le groupe A et les liens vers F.
+
+── ÉTAPES ──────────────────────────────────────────────
+  [ 0]  GC_A1 ◆ (initiale)
+        Arrêt dans état initial
+        → # Actions de A1 à compléter
+  [ 1]  GC_A6
+        Mise P.O. dans l'état initial
+        → # Actions de A6 à compléter
+  [ 2]  GC_A7
+        Mise P.O. dans état déterminé
+        → # Actions de A7 à compléter
+  [ 3]  GC_F1
+        Production normale
+        → # Actions de F1 à compléter
+  [ 4]  GC_F2
+        Marches de préparation
+        → # Actions de F2 à compléter
+  [ 5]  GC_F3
+        Marches de clôture
+        → # Actions de F3 à compléter
+  [ 6]  GC_F4
+        Marches de vérification dans le désordre
+        → # Actions de F4 à compléter
+  [ 7]  GC_F5
+        Marches de vérification dans l'ordre
+        → # Actions de F5 à compléter
+  [ 8]  GC_F6
+        Marches de test
+        → # Actions de F6 à compléter
+  [ 9]  GC_A2
+        Arrêt demandé en fin de cycle
+        → # Actions de A2 à compléter
+  [10]  GC_A3
+        Arrêt demandé dans un état déterminé
+        → # Actions de A3 à compléter
+  [11]  GC_A4
+        Arrêt obtenu
+        → # Actions de A4 à compléter
+  [12]  GC_A5
+        Préparation pour remise en route après défaillance
+        → # Actions de A5 à compléter
+
+── TRANSITIONS ─────────────────────────────────────────
+  [ 0] ──( Depart_cycle )──▶ [ 3]  # A1 → F1
+  [ 0] ──( Mode_preparation )──▶ [ 4]  # A1 → F2
+  [ 0] ──( Mode_verif_libre )──▶ [ 6]  # A1 → F4
+  [ 0] ──( Mode_verif_seq )──▶ [ 7]  # A1 → F5
+  [ 9] ──( Fin_cycle )──▶ [ 0]  # A2 → A1
+  [10] ──( Arret_obtenu )──▶ [11]  # A3 → A4
+  [11] ──( Init_position )──▶ [ 1]  # A4 → A6
+  [11] ──( Remise_en_marche )──▶ [ 3]  # A4 → F1
+  [12] ──( Reset_machine )──▶ [ 1]  # A5 → A6
+  [12] ──( Mode_reglage )──▶ [ 2]  # A5 → A7
+  [ 1] ──( Init_OK )──▶ [ 0]  # A6 → A1
+  [ 2] ──( Arret_obtenu )──▶ [11]  # A7 → A4
+  [ 2] ──( Quitter_reglage )──▶ [ 1]  # A7 → A6
+  [ 3] ──( Stop )──▶ [ 9]  # F1 → A2
+  [ 3] ──( Stop_immediat )──▶ [10]  # F1 → A3
+  [ 3] ──( Mode_cloture )──▶ [ 5]  # F1 → F3
+  [ 3] ──( Mode_verif_libre )──▶ [ 6]  # F1 → F4
+  [ 3] ──( Mode_verif_seq )──▶ [ 7]  # F1 → F5
+  [ 3] ──( Mode_test )──▶ [ 8]  # F1 → F6
+  [ 4] ──( Preparation_ok )──▶ [ 3]  # F2 → F1
+  [ 5] ──( Cloture_ok )──▶ [ 0]  # F3 → A1
+  [ 6] ──( CI )──▶ [ 1]  # F4 → A6
+  [ 7] ──( Fin_verif )──▶ [ 3]  # F5 → F1
+  [ 7] ──( Passage_verif_libre )──▶ [ 6]  # F5 → F4
+  [ 8] ──( Fin_test )──▶ [ 3]  # F6 → F1
+
+============================================================
+IL/ST IEC 61131-3
+============================================================
+(* ===== Grafcet de Commande ===== *)
+(* Gère les procédures de démarrage, d'arrêt normal/d'urgence et de remise en route. Couvre le groupe A et les liens vers F. *)
+
+(* --- Étapes (BOOL) --- *)
+VAR  GC_E00 : BOOL := TRUE;  (* Arrêt dans état initial *)
+VAR  GC_E01 : BOOL := FALSE;  (* Mise P.O. dans l'état initial *)
+VAR  GC_E02 : BOOL := FALSE;  (* Mise P.O. dans état déterminé *)
+VAR  GC_E03 : BOOL := FALSE;  (* Production normale *)
+VAR  GC_E04 : BOOL := FALSE;  (* Marches de préparation *)
+VAR  GC_E05 : BOOL := FALSE;  (* Marches de clôture *)
+VAR  GC_E06 : BOOL := FALSE;  (* Marches de vérification dans le désordre *)
+VAR  GC_E07 : BOOL := FALSE;  (* Marches de vérification dans l'ordre *)
+VAR  GC_E08 : BOOL := FALSE;  (* Marches de test *)
+VAR  GC_E09 : BOOL := FALSE;  (* Arrêt demandé en fin de cycle *)
+VAR  GC_E10 : BOOL := FALSE;  (* Arrêt demandé dans un état déterminé *)
+VAR  GC_E11 : BOOL := FALSE;  (* Arrêt obtenu *)
+VAR  GC_E12 : BOOL := FALSE;  (* Préparation pour remise en route après défaillance *)
+
+(* --- Actions --- *)
+(* Étape 0 : Arrêt dans état initial *)
+  # Actions de A1 à compléter
+(* Étape 1 : Mise P.O. dans l'état initial *)
+  # Actions de A6 à compléter
+(* Étape 2 : Mise P.O. dans état déterminé *)
+  # Actions de A7 à compléter
+(* Étape 3 : Production normale *)
+  # Actions de F1 à compléter
+(* Étape 4 : Marches de préparation *)
+  # Actions de F2 à compléter
+(* Étape 5 : Marches de clôture *)
+  # Actions de F3 à compléter
+(* Étape 6 : Marches de vérification dans le désordre *)
+  # Actions de F4 à compléter
+(* Étape 7 : Marches de vérification dans l'ordre *)
+  # Actions de F5 à compléter
+(* Étape 8 : Marches de test *)
+  # Actions de F6 à compléter
+(* Étape 9 : Arrêt demandé en fin de cycle *)
+  # Actions de A2 à compléter
+(* Étape 10 : Arrêt demandé dans un état déterminé *)
+  # Actions de A3 à compléter
+(* Étape 11 : Arrêt obtenu *)
+  # Actions de A4 à compléter
+(* Étape 12 : Préparation pour remise en route après défaillance *)
+  # Actions de A5 à compléter
+
+(* --- Transitions --- *)
+IF GC_E00 AND (Depart_cycle) THEN  (* A1 → F1 *)
+    GC_E00 := FALSE;
+    GC_E03 := TRUE;
+END_IF;
+IF GC_E00 AND (Mode_preparation) THEN  (* A1 → F2 *)
+    GC_E00 := FALSE;
+    GC_E04 := TRUE;
+END_IF;
+IF GC_E00 AND (Mode_verif_libre) THEN  (* A1 → F4 *)
+    GC_E00 := FALSE;
+    GC_E06 := TRUE;
+END_IF;
+IF GC_E00 AND (Mode_verif_seq) THEN  (* A1 → F5 *)
+    GC_E00 := FALSE;
+    GC_E07 := TRUE;
+END_IF;
+IF GC_E09 AND (Fin_cycle) THEN  (* A2 → A1 *)
+    GC_E09 := FALSE;
+    GC_E00 := TRUE;
+END_IF;
+IF GC_E10 AND (Arret_obtenu) THEN  (* A3 → A4 *)
+    GC_E10 := FALSE;
+    GC_E11 := TRUE;
+END_IF;
+IF GC_E11 AND (Init_position) THEN  (* A4 → A6 *)
+    GC_E11 := FALSE;
+    GC_E01 := TRUE;
+END_IF;
+IF GC_E11 AND (Remise_en_marche) THEN  (* A4 → F1 *)
+    GC_E11 := FALSE;
+    GC_E03 := TRUE;
+END_IF;
+IF GC_E12 AND (Reset_machine) THEN  (* A5 → A6 *)
+    GC_E12 := FALSE;
+    GC_E01 := TRUE;
+END_IF;
+IF GC_E12 AND (Mode_reglage) THEN  (* A5 → A7 *)
+    GC_E12 := FALSE;
+    GC_E02 := TRUE;
+END_IF;
+IF GC_E01 AND (Init_OK) THEN  (* A6 → A1 *)
+    GC_E01 := FALSE;
+    GC_E00 := TRUE;
+END_IF;
+IF GC_E02 AND (Arret_obtenu) THEN  (* A7 → A4 *)
+    GC_E02 := FALSE;
+    GC_E11 := TRUE;
+END_IF;
+IF GC_E02 AND (Quitter_reglage) THEN  (* A7 → A6 *)
+    GC_E02 := FALSE;
+    GC_E01 := TRUE;
+END_IF;
+IF GC_E03 AND (Stop) THEN  (* F1 → A2 *)
+    GC_E03 := FALSE;
+    GC_E09 := TRUE;
+END_IF;
+IF GC_E03 AND (Stop_immediat) THEN  (* F1 → A3 *)
+    GC_E03 := FALSE;
+    GC_E10 := TRUE;
+END_IF;
+IF GC_E03 AND (Mode_cloture) THEN  (* F1 → F3 *)
+    GC_E03 := FALSE;
+    GC_E05 := TRUE;
+END_IF;
+IF GC_E03 AND (Mode_verif_libre) THEN  (* F1 → F4 *)
+    GC_E03 := FALSE;
+    GC_E06 := TRUE;
+END_IF;
+IF GC_E03 AND (Mode_verif_seq) THEN  (* F1 → F5 *)
+    GC_E03 := FALSE;
+    GC_E07 := TRUE;
+END_IF;
+IF GC_E03 AND (Mode_test) THEN  (* F1 → F6 *)
+    GC_E03 := FALSE;
+    GC_E08 := TRUE;
+END_IF;
+IF GC_E04 AND (Preparation_ok) THEN  (* F2 → F1 *)
+    GC_E04 := FALSE;
+    GC_E03 := TRUE;
+END_IF;
+IF GC_E05 AND (Cloture_ok) THEN  (* F3 → A1 *)
+    GC_E05 := FALSE;
+    GC_E00 := TRUE;
+END_IF;
+IF GC_E06 AND (CI) THEN  (* F4 → A6 *)
+    GC_E06 := FALSE;
+    GC_E01 := TRUE;
+END_IF;
+IF GC_E07 AND (Fin_verif) THEN  (* F5 → F1 *)
+    GC_E07 := FALSE;
+    GC_E03 := TRUE;
+END_IF;
+IF GC_E07 AND (Passage_verif_libre) THEN  (* F5 → F4 *)
+    GC_E07 := FALSE;
+    GC_E06 := TRUE;
+END_IF;
+IF GC_E08 AND (Fin_test) THEN  (* F6 → F1 *)
+    GC_E08 := FALSE;
+    GC_E03 := TRUE;
+END_IF;

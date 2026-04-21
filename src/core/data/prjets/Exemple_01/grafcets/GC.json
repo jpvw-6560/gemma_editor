@@ -1,0 +1,279 @@
+{
+  "nom": "GC",
+  "titre": "Grafcet de Commande",
+  "description": "Gère les procédures de démarrage, d'arrêt normal/d'urgence\net de remise en route. Couvre le groupe A et les liens vers F.",
+  "etapes": [
+    {
+      "num": 0,
+      "nom": "GC_A1",
+      "label": "Arrêt dans état initial",
+      "actions": [
+        "# Actions de A1 à compléter"
+      ],
+      "initiale": true
+    },
+    {
+      "num": 1,
+      "nom": "GC_A6",
+      "label": "Mise P.O. dans l'état initial",
+      "actions": [
+        "# Actions de A6 à compléter"
+      ],
+      "initiale": false
+    },
+    {
+      "num": 2,
+      "nom": "GC_A7",
+      "label": "Mise P.O. dans état déterminé",
+      "actions": [
+        "# Actions de A7 à compléter"
+      ],
+      "initiale": false
+    },
+    {
+      "num": 3,
+      "nom": "GC_F1",
+      "label": "Production normale",
+      "actions": [
+        "# Actions de F1 à compléter"
+      ],
+      "initiale": false
+    },
+    {
+      "num": 4,
+      "nom": "GC_F2",
+      "label": "Marches de préparation",
+      "actions": [
+        "# Actions de F2 à compléter"
+      ],
+      "initiale": false
+    },
+    {
+      "num": 5,
+      "nom": "GC_F3",
+      "label": "Marches de clôture",
+      "actions": [
+        "# Actions de F3 à compléter"
+      ],
+      "initiale": false
+    },
+    {
+      "num": 6,
+      "nom": "GC_F4",
+      "label": "Marches de vérification dans le désordre",
+      "actions": [
+        "# Actions de F4 à compléter"
+      ],
+      "initiale": false
+    },
+    {
+      "num": 7,
+      "nom": "GC_F5",
+      "label": "Marches de vérification dans l'ordre",
+      "actions": [
+        "# Actions de F5 à compléter"
+      ],
+      "initiale": false
+    },
+    {
+      "num": 8,
+      "nom": "GC_F6",
+      "label": "Marches de test",
+      "actions": [
+        "# Actions de F6 à compléter"
+      ],
+      "initiale": false
+    },
+    {
+      "num": 9,
+      "nom": "GC_A2",
+      "label": "Arrêt demandé en fin de cycle",
+      "actions": [
+        "# Actions de A2 à compléter"
+      ],
+      "initiale": false
+    },
+    {
+      "num": 10,
+      "nom": "GC_A3",
+      "label": "Arrêt demandé dans un état déterminé",
+      "actions": [
+        "# Actions de A3 à compléter"
+      ],
+      "initiale": false
+    },
+    {
+      "num": 11,
+      "nom": "GC_A4",
+      "label": "Arrêt obtenu",
+      "actions": [
+        "# Actions de A4 à compléter"
+      ],
+      "initiale": false
+    },
+    {
+      "num": 12,
+      "nom": "GC_A5",
+      "label": "Préparation pour remise en route après défaillance",
+      "actions": [
+        "# Actions de A5 à compléter"
+      ],
+      "initiale": false
+    }
+  ],
+  "transitions": [
+    {
+      "de": 8,
+      "vers": 3,
+      "receptivite": "Fin_test",
+      "commentaire": "F6 → F1"
+    },
+    {
+      "de": 7,
+      "vers": 6,
+      "receptivite": "Passage_verif_libre",
+      "commentaire": "F5 → F4"
+    },
+    {
+      "de": 7,
+      "vers": 3,
+      "receptivite": "Fin_verif",
+      "commentaire": "F5 → F1"
+    },
+    {
+      "de": 6,
+      "vers": 1,
+      "receptivite": "CI",
+      "commentaire": "F4 → A6"
+    },
+    {
+      "de": 5,
+      "vers": 0,
+      "receptivite": "Cloture_ok",
+      "commentaire": "F3 → A1"
+    },
+    {
+      "de": 4,
+      "vers": 3,
+      "receptivite": "Preparation_ok",
+      "commentaire": "F2 → F1"
+    },
+    {
+      "de": 3,
+      "vers": 8,
+      "receptivite": "Mode_test",
+      "commentaire": "F1 → F6"
+    },
+    {
+      "de": 3,
+      "vers": 7,
+      "receptivite": "Mode_verif_seq",
+      "commentaire": "F1 → F5"
+    },
+    {
+      "de": 3,
+      "vers": 6,
+      "receptivite": "Mode_verif_libre",
+      "commentaire": "F1 → F4"
+    },
+    {
+      "de": 3,
+      "vers": 5,
+      "receptivite": "Mode_cloture",
+      "commentaire": "F1 → F3"
+    },
+    {
+      "de": 3,
+      "vers": 10,
+      "receptivite": "Stop_immediat",
+      "commentaire": "F1 → A3"
+    },
+    {
+      "de": 3,
+      "vers": 9,
+      "receptivite": "Stop",
+      "commentaire": "F1 → A2"
+    },
+    {
+      "de": 2,
+      "vers": 1,
+      "receptivite": "Quitter_reglage",
+      "commentaire": "A7 → A6"
+    },
+    {
+      "de": 2,
+      "vers": 11,
+      "receptivite": "Arret_obtenu",
+      "commentaire": "A7 → A4"
+    },
+    {
+      "de": 1,
+      "vers": 0,
+      "receptivite": "Init_OK",
+      "commentaire": "A6 → A1"
+    },
+    {
+      "de": 12,
+      "vers": 2,
+      "receptivite": "Mode_reglage",
+      "commentaire": "A5 → A7"
+    },
+    {
+      "de": 12,
+      "vers": 1,
+      "receptivite": "Reset_machine",
+      "commentaire": "A5 → A6"
+    },
+    {
+      "de": 11,
+      "vers": 3,
+      "receptivite": "Remise_en_marche",
+      "commentaire": "A4 → F1"
+    },
+    {
+      "de": 11,
+      "vers": 1,
+      "receptivite": "Init_position",
+      "commentaire": "A4 → A6"
+    },
+    {
+      "de": 10,
+      "vers": 11,
+      "receptivite": "Arret_obtenu",
+      "commentaire": "A3 → A4"
+    },
+    {
+      "de": 9,
+      "vers": 0,
+      "receptivite": "Fin_cycle",
+      "commentaire": "A2 → A1"
+    },
+    {
+      "de": 0,
+      "vers": 7,
+      "receptivite": "Mode_verif_seq",
+      "commentaire": "A1 → F5"
+    },
+    {
+      "de": 0,
+      "vers": 6,
+      "receptivite": "Mode_verif_libre",
+      "commentaire": "A1 → F4"
+    },
+    {
+      "de": 0,
+      "vers": 4,
+      "receptivite": "Mode_preparation",
+      "commentaire": "A1 → F2"
+    },
+    {
+      "de": 0,
+      "vers": 3,
+      "receptivite": "Depart_cycle",
+      "commentaire": "A1 → F1"
+    }
+  ],
+  "avertissements": [
+    "A5 (Préparation pour remise en route après défaillance) n'a pas de liaison entrante dans le GC — activé depuis D2, D1 (hors GC, voir GS)."
+  ]
+}
